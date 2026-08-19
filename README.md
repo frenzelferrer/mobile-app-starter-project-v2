@@ -10,6 +10,12 @@ Read about TuonTa! and access the installation instructions through the official
 
 The direct GitHub release asset is also available here: [Download TuonTa! APK](https://github.com/frenzelferrer/mobile-app-starter-project-v2/releases/download/v1.0.0/TuonTa.apk).
 
+## First-launch onboarding
+
+Fresh installs open with an animated TuonTa! welcome screen instead of the task dashboard. The user enters a name, sees a live personalized greeting preview, and presses **Enter TuonTa!** to save the profile and reveal the main app. Names are validated before continuing, and the onboarding completion state is persisted with AsyncStorage so the welcome screen does not repeat on every launch.
+
+Existing users with a meaningful saved name are migrated into the main app automatically. Profile editing remains available after onboarding, and resetting the sample profile intentionally returns the app to the name-entry flow.
+
 ## Run locally
 
 From the repository root, install dependencies and start Expo:
@@ -71,7 +77,7 @@ The screens use `react-native-safe-area-context` through `SafeAreaProvider` so h
 
 ## Main features
 
-The app includes a dashboard with computed total, completed, pending, high-priority, and completion-percentage statistics. The Tasks tab provides search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains persisted student details and a reset-to-sample-data action, while the Home screen provides the clickable moon/sun dark-mode control.
+The app includes an animated first-launch name greeting, a dashboard with computed total, completed, pending, high-priority, and completion-percentage statistics, and a Tasks tab with search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains persisted student details and a reset-to-sample-data action, while the Home screen provides the clickable moon/sun dark-mode control.
 
 ## Navigation structure
 
@@ -122,7 +128,8 @@ src/
 │   ├── HomeScreen.tsx
 │   ├── ProfileScreen.tsx
 │   ├── TaskDetailsScreen.tsx
-│   └── TaskListScreen.tsx
+│   ├── TaskListScreen.tsx
+│   └── WelcomeScreen.tsx
 ├── theme/
 │   └── colors.ts
 ├── types/
@@ -177,6 +184,7 @@ A title is required and must contain at least three characters. Subject and desc
 | Local persistence | `TaskContext.tsx` and `SettingsContext.tsx` use AsyncStorage |
 | Sorting | `TaskListScreen.tsx` cycles through due date, priority, and newest |
 | Progress tracking | `HomeScreen.tsx` calculates and displays completion percentage |
+| First-launch onboarding | `WelcomeScreen.tsx`, `SettingsContext.tsx`, and `App.tsx` |
 | Dark mode | Home-screen moon/sun icon, `SettingsContext.tsx`, `App.tsx`, and theme-aware screens/components |
 
 ## Local verification checklist
@@ -187,6 +195,6 @@ Run a type check before presenting the project:
 npx tsc --noEmit
 ```
 
-Then manually verify the following flow: wait for saved data to restore; search, filter, and sort the sample tasks; inspect overdue/due-soon labels; open a task and confirm its details; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; close and reopen the app to verify persistence; tap the Home-screen moon/sun icon to toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts and list badges should update immediately after each state change.
+Then manually verify the following flow: clear the app’s local data or use Reset sample data to return to onboarding; confirm the animated welcome screen appears; type a name and watch the greeting preview update; try to continue with an invalid name; submit a valid name and confirm the success transition opens the dashboard; close and reopen the app to verify onboarding is skipped; edit the saved name from Profile and confirm Home updates; search, filter, and sort the sample tasks; inspect overdue/due-soon labels; open a task and confirm its details; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; tap the Home-screen moon/sun icon to toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts and list badges should update immediately after each state change.
 
 The placeholder profile values are in `src/screens/ProfileScreen.tsx` and can be replaced with the student’s actual name, course, year level, and student number.

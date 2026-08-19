@@ -11,6 +11,7 @@ export interface ProfileSettings {
   yearLevel: string;
   studentNumber: string;
   darkMode: boolean;
+  onboardingComplete: boolean;
 }
 
 interface SettingsContextValue {
@@ -28,6 +29,7 @@ const defaultSettings: ProfileSettings = {
   yearLevel: "3rd Year",
   studentNumber: "2025XXXXX",
   darkMode: false,
+  onboardingComplete: false,
 };
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
@@ -42,7 +44,14 @@ export function SettingsProvider({ children }: PropsWithChildren) {
         if (!stored) return;
         try {
           const parsed = JSON.parse(stored) as Partial<ProfileSettings>;
-          setSettings((current) => ({ ...current, ...parsed }));
+          setSettings((current) => {
+            const next = { ...current, ...parsed };
+            const hasMeaningfulName = typeof next.name === "string" && next.name.trim().length >= 2 && next.name.trim().toLowerCase() !== "your name";
+            return {
+              ...next,
+              onboardingComplete: typeof parsed.onboardingComplete === "boolean" ? parsed.onboardingComplete : hasMeaningfulName,
+            };
+          });
         } catch {
           // Invalid local settings are ignored and replaced with safe defaults.
         }
