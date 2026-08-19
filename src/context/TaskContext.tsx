@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { parseMockTasks } from "@/data/mockTasks";
 import type { Task, TaskFormData } from "@/types/task";
 
-const TASKS_KEY = "studyflow.tasks.v1";
+const TASKS_KEY = "tuonta.tasks.v1";
 
 interface TaskContextValue {
   tasks: Task[];

@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 
 import { darkColors, lightColors, type AppColors } from "@/theme/colors";
 
-const SETTINGS_KEY = "studyflow.settings.v1";
+const SETTINGS_KEY = "tuonta.settings.v1";
 
 export interface ProfileSettings {
   name: string;

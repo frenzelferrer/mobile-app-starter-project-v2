@@ -1,6 +1,6 @@
-# StudyFlow
+# TuonTa!
 
-**StudyFlow** is a React Native + TypeScript student task-management app for Midterm Task No. 4. It helps students track assignments, quizzes, projects, and deadlines through a dashboard, searchable task list, validated forms, task details, editing, completion status, deletion, and a profile screen.
+**TuonTa!** is a React Native + TypeScript student task-management app for Midterm Task No. 4. It helps students track assignments, quizzes, projects, and deadlines through a dashboard, searchable task list, validated forms, task details, editing, completion status, deletion, and a profile screen.
 
 The project is intentionally local-only. It does not use a backend, Firebase, Supabase, Express, or a database. Task data is shared through a small React Context and starts from a parsed JSON string so the core React Native and TypeScript concepts remain easy to explain.
 
@@ -50,6 +50,10 @@ Selecting a task passes only its ID through a typed React Navigation parameter. 
 
 ```text
 App.tsx
+assets/
+└── branding/
+    ├── tuonta-icon.png
+    └── tuonta-logo.png
 src/
 ├── components/
 │   ├── FormInput.tsx
@@ -79,6 +83,10 @@ src/
 └── utils/
     └── validation.ts
 ```
+
+## TuonTa! brand system
+
+The official supplied assets are stored in `assets/branding/`. The square `tuonta-icon.png` is used for the Expo app icon, Android adaptive foreground, iOS icon, and web favicon. The `tuonta-logo.png` wordmark is used in the Profile/About area and splash configuration. User-facing branding uses **TuonTa!**, with the supporting tagline **Tuon ta, human ta.** Technical identifiers use the safe internal slug `tuonta`.
 
 ## Important implementation notes
 

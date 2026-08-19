@@ -1,36 +1,34 @@
 {
   "expo": {
-    "name": "StudyFlow",
-    "slug": "studyflow",
+    "name": "TuonTa!",
+    "slug": "tuonta",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "studyflow",
+    "icon": "./assets/branding/tuonta-icon.png",
+    "scheme": "tuonta",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/branding/tuonta-icon.png"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E9EEFF",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/branding/tuonta-icon.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/branding/tuonta-icon.png"
     },
     "plugins": [
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F6F8FC",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#FFFFFF",
+          "image": "./assets/branding/tuonta-logo.png",
+          "imageWidth": 220
         }
       ]
     ]
