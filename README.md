@@ -4,6 +4,12 @@
 
 The project is intentionally local-only. It does not use a backend, Firebase, Supabase, Express, or a database. Task data is shared through a small React Context and starts from a parsed JSON string so the core React Native and TypeScript concepts remain easy to explain.
 
+## TuonTa! website and APK
+
+Read about TuonTa! and access the installation instructions through the official project website: [https://tuon-ta-website.vercel.app/](https://tuon-ta-website.vercel.app/). The website includes a **Download APK** button for installing the Android application directly.
+
+The direct GitHub release asset is also available here: [Download TuonTa! APK](https://github.com/frenzelferrer/mobile-app-starter-project-v2/releases/download/v1.0.0/TuonTa.apk).
+
 ## Run locally
 
 From the repository root, install dependencies and start Expo:
@@ -65,7 +71,7 @@ The screens use `react-native-safe-area-context` through `SafeAreaProvider` so h
 
 ## Main features
 
-The app includes a dashboard with computed total, completed, pending, high-priority, and completion-percentage statistics. The Tasks tab provides search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains persisted student details, a dark-mode toggle, and a reset-to-sample-data action.
+The app includes a dashboard with computed total, completed, pending, high-priority, and completion-percentage statistics. The Tasks tab provides search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains persisted student details and a reset-to-sample-data action, while the Home screen provides the clickable moon/sun dark-mode control.
 
 ## Navigation structure
 
