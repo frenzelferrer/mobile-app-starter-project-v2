@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { SettingsProvider, useSettings } from "@/context/SettingsContext";
+import { FocusProvider } from "@/context/FocusContext";
 import { TaskProvider } from "@/context/TaskContext";
 import { AppNavigator } from "@/navigation/AppNavigator";
 import { WelcomeScreen } from "@/screens/WelcomeScreen";
@@ -24,7 +25,7 @@ function AppShell() {
 }
 
 export default function App() {
-  return <SafeAreaProvider><SettingsProvider><TaskProvider><AppShell /></TaskProvider></SettingsProvider></SafeAreaProvider>;
+  return <SafeAreaProvider><SettingsProvider><TaskProvider><FocusProvider><AppShell /></FocusProvider></TaskProvider></SettingsProvider></SafeAreaProvider>;
 }
 
 const styles = StyleSheet.create({

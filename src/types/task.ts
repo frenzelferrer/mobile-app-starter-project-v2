@@ -12,3 +12,11 @@ export interface Task {
 }
 
 export type TaskFormData = Omit<Task, "id">;
+
+export interface FocusSession {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  minutes: number;
+  completedAt: string;
+}

@@ -5,10 +5,12 @@ import { Text } from "react-native";
 import { useSettings } from "@/context/SettingsContext";
 import { AddTaskScreen } from "@/screens/AddTaskScreen";
 import { EditTaskScreen } from "@/screens/EditTaskScreen";
+import { FocusTimerScreen } from "@/screens/FocusTimerScreen";
 import { HomeScreen } from "@/screens/HomeScreen";
 import { ProfileScreen } from "@/screens/ProfileScreen";
 import { TaskDetailsScreen } from "@/screens/TaskDetailsScreen";
 import { TaskListScreen } from "@/screens/TaskListScreen";
+import { TimelineScreen } from "@/screens/TimelineScreen";
 import type { RootTabParamList, TasksStackParamList } from "@/navigation/navigationTypes";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -16,7 +18,7 @@ const Stack = createNativeStackNavigator<TasksStackParamList>();
 
 function TasksStackNavigator() {
   const { colors } = useSettings();
-  return <Stack.Navigator screenOptions={{ headerTintColor: colors.text, headerTitleStyle: { fontWeight: "800" }, headerStyle: { backgroundColor: colors.background }, contentStyle: { backgroundColor: colors.background } }}><Stack.Screen name="TaskList" component={TaskListScreen} options={{ headerShown: false }} /><Stack.Screen name="AddTask" component={AddTaskScreen} options={{ title: "New task" }} /><Stack.Screen name="TaskDetails" component={TaskDetailsScreen} options={{ title: "Task details" }} /><Stack.Screen name="EditTask" component={EditTaskScreen} options={{ title: "Edit task" }} /></Stack.Navigator>;
+  return <Stack.Navigator screenOptions={{ headerTintColor: colors.text, headerTitleStyle: { fontWeight: "800" }, headerStyle: { backgroundColor: colors.background }, contentStyle: { backgroundColor: colors.background } }}><Stack.Screen name="TaskList" component={TaskListScreen} options={{ headerShown: false }} /><Stack.Screen name="AddTask" component={AddTaskScreen} options={{ title: "New task" }} /><Stack.Screen name="TaskDetails" component={TaskDetailsScreen} options={{ title: "Task details" }} /><Stack.Screen name="EditTask" component={EditTaskScreen} options={{ title: "Edit task" }} /><Stack.Screen name="FocusTimer" component={FocusTimerScreen} options={{ headerShown: false }} /><Stack.Screen name="Timeline" component={TimelineScreen} options={{ headerShown: false }} /></Stack.Navigator>;
 }
 
 export function AppNavigator() {

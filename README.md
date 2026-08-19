@@ -77,7 +77,7 @@ The screens use `react-native-safe-area-context` through `SafeAreaProvider` so h
 
 ## Main features
 
-The app includes an animated first-launch name greeting, a dashboard with computed total, completed, pending, high-priority, and completion-percentage statistics, and a Tasks tab with search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains persisted student details and a reset-to-sample-data action, while the Home screen provides the clickable moon/sun dark-mode control.
+The app includes an animated first-launch name greeting, a dashboard with computed total, completed, pending, high-priority, completion-percentage, and weekly productivity statistics, and a Tasks tab with search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, start a task-linked Focus Study Timer, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Tasks area also includes a grouped deadline Timeline. The Profile tab contains persisted student details and a reset-to-sample-data action, while the Home screen provides the clickable moon/sun dark-mode control.
 
 ## Navigation structure
 
@@ -92,7 +92,9 @@ NavigationContainer
     │       ├── TaskList
     │       ├── AddTask
     │       ├── TaskDetails { taskId: string }
-    │       └── EditTask { taskId: string }
+    │       ├── EditTask { taskId: string }
+    │       ├── FocusTimer { taskId: string }
+    │       └── Timeline
     └── Profile
 ```
 
@@ -115,6 +117,7 @@ src/
 │   ├── TaskCard.tsx
 │   └── TaskForm.tsx
 ├── context/
+│   ├── FocusContext.tsx
 │   ├── SettingsContext.tsx
 │   └── TaskContext.tsx
 ├── data/
@@ -128,14 +131,17 @@ src/
 │   ├── HomeScreen.tsx
 │   ├── ProfileScreen.tsx
 │   ├── TaskDetailsScreen.tsx
+│   ├── FocusTimerScreen.tsx
 │   ├── TaskListScreen.tsx
+│   ├── TimelineScreen.tsx
 │   └── WelcomeScreen.tsx
 ├── theme/
 │   └── colors.ts
 ├── types/
 │   └── task.ts
-└── utils/
-    └── validation.ts
+├── utils/
+│   ├── productivity.ts
+│   └── validation.ts
 ```
 
 ## TuonTa! brand system
@@ -180,7 +186,7 @@ A title is required and must contain at least three characters. Subject and desc
 | Read | Home statistics, Task List, and Task Details |
 | Update | `EditTaskScreen.tsx`, status toggle, and `TaskContext.updateTask()` |
 | Delete | `TaskDetailsScreen.tsx` and `TaskContext.deleteTask()` |
-| `Six screens` | Home, Task List, Add, Details, Edit, and Profile |
+| Productivity tools | Focus Timer, deadline Timeline, and weekly Home summary |
 | Local persistence | `TaskContext.tsx` and `SettingsContext.tsx` use AsyncStorage |
 | Sorting | `TaskListScreen.tsx` cycles through due date, priority, and newest |
 | Progress tracking | `HomeScreen.tsx` calculates and displays completion percentage |
@@ -195,6 +201,6 @@ Run a type check before presenting the project:
 npx tsc --noEmit
 ```
 
-Then manually verify the following flow: clear the app’s local data or use Reset sample data to return to onboarding; confirm the animated welcome screen appears; type a name and watch the greeting preview update; try to continue with an invalid name; submit a valid name and confirm the success transition opens the dashboard; close and reopen the app to verify onboarding is skipped; edit the saved name from Profile and confirm Home updates; search, filter, and sort the sample tasks; inspect overdue/due-soon labels; open a task and confirm its details; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; tap the Home-screen moon/sun icon to toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts and list badges should update immediately after each state change.
+Then manually verify the following flow: clear the app’s local data or use Reset sample data to return to onboarding; confirm the animated welcome screen appears; type a name and watch the greeting preview update; try to continue with an invalid name; submit a valid name and confirm the success transition opens the dashboard; close and reopen the app to verify onboarding is skipped; edit the saved name from Profile and confirm Home updates; search, filter, and sort the sample tasks; open Timeline and select a grouped deadline; inspect overdue/due-soon labels; open a task and confirm its details; start a Focus Study Timer, pause it, resume it, finish it early, and confirm the weekly focus summary updates; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; tap the Home-screen moon/sun icon to toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts, weekly metrics, timeline groups, and list badges should update immediately after each state change.
 
 The placeholder profile values are in `src/screens/ProfileScreen.tsx` and can be replaced with the student’s actual name, course, year level, and student number.
