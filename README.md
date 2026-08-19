@@ -23,6 +23,44 @@ npm run web
 
 The Android and iOS commands require the corresponding emulator/simulator or a connected device. The web command is useful for quickly checking navigation and form behavior in a browser. The project scripts set the required Expo compatibility flag because the Expo CLI bundles Expo Router transitively, while this application intentionally uses direct React Navigation. On Windows, `scripts/start-expo.cjs` launches the `.cmd` executable through the native shell, so `npm start` works without manually setting environment variables.
 
+## EAS Android builds
+
+The project is preconfigured for EAS Build with the Android package identifier `com.gabri.tuonta`.
+
+Install and authenticate the EAS CLI from PowerShell:
+
+```powershell
+npm install --global eas-cli
+eas login
+eas whoami
+```
+
+For a standalone grading APK, run:
+
+```powershell
+eas build --platform android --profile production-apk
+```
+
+The `production-apk` profile in `eas.json` uses internal distribution and `android.buildType: "apk"`, so the resulting file can be installed directly on an Android device or emulator. For a Google Play submission, use the standard AAB profile instead:
+
+```powershell
+eas build --platform android --profile production
+```
+
+After a build completes, use the EAS download URL or list builds with:
+
+```powershell
+eas build:list --platform android --limit 5
+```
+
+To install an APK with ADB:
+
+```powershell
+adb install .\\tuonta.apk
+```
+
+The APK is standalone and does not require `npm start`, Metro, or Expo Go. EAS reads the TuonTa! icon, splash logo, favicon configuration, and app metadata from the repository during the build.
+
 ## Main features
 
 The app includes a dashboard with computed total, completed, pending, high-priority, and completion-percentage statistics. The Tasks tab provides search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains persisted student details, a dark-mode toggle, and a reset-to-sample-data action.
@@ -50,6 +88,7 @@ Selecting a task passes only its ID through a typed React Navigation parameter. 
 
 ```text
 App.tsx
+eas.json
 assets/
 └── branding/
     ├── tuonta-icon.png

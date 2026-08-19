@@ -12,6 +12,7 @@
       "icon": "./assets/branding/tuonta-icon.png"
     },
     "android": {
+      "package": "com.gabri.tuonta",
       "adaptiveIcon": {
         "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/branding/tuonta-icon.png"
