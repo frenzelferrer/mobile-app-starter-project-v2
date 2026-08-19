@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
+import { CelebrationOverlay } from "@/components/CelebrationOverlay";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { useFocus } from "@/context/FocusContext";
 import { useSettings } from "@/context/SettingsContext";
@@ -13,7 +14,7 @@ const PRESETS = [15, 25, 45, 60];
 type Props = NativeStackScreenProps<TasksStackParamList, "FocusTimer">;
 
 export function FocusTimerScreen({ route, navigation }: Props) {
-  const { colors } = useSettings();
+  const { colors, settings } = useSettings();
   const { getTaskById } = useTasks();
   const { addSession } = useFocus();
   const task = getTaskById(route.params.taskId);
@@ -22,6 +23,7 @@ export function FocusTimerScreen({ route, navigation }: Props) {
   const [isRunning, setIsRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [celebrationVisible, setCelebrationVisible] = useState(false);
   const sessionRecorded = useRef(false);
 
   const durationSeconds = selectedMinutes * 60;
@@ -41,7 +43,8 @@ export function FocusTimerScreen({ route, navigation }: Props) {
     setIsRunning(false);
     setCompleted(true);
     addSession({ taskId: task.id, taskTitle: task.title, minutes: selectedMinutes });
-  }, [addSession, hasStarted, remainingSeconds, selectedMinutes, task]);
+    if (settings.completionFeedbackEnabled) setCelebrationVisible(true);
+  }, [addSession, hasStarted, remainingSeconds, selectedMinutes, settings.completionFeedbackEnabled, task]);
 
   const handlePreset = (value: number) => {
     if (hasStarted && !completed) return;
@@ -72,13 +75,14 @@ export function FocusTimerScreen({ route, navigation }: Props) {
     setIsRunning(false);
     setCompleted(true);
     addSession({ taskId: task.id, taskTitle: task.title, minutes: Math.max(1, Math.round((durationSeconds - remainingSeconds) / 60)) });
+    if (settings.completionFeedbackEnabled) setCelebrationVisible(true);
   };
 
   if (!task) {
     return <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}><View style={styles.notFound}><Text style={[styles.title, { color: colors.text }]}>Task not found</Text><PrimaryButton label="Back to tasks" onPress={() => navigation.popToTop()} /></View></SafeAreaView>;
   }
 
-  return <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}><ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}><View style={styles.header}><Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => navigation.goBack()} style={({ pressed }) => [styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && styles.pressed]}><Text style={[styles.backIcon, { color: colors.primary }]}>‹</Text></Pressable><View><Text style={[styles.eyebrow, { color: colors.primary }]}>FOCUS MODE</Text><Text style={[styles.headerTitle, { color: colors.text }]}>Study timer</Text></View><View style={{ width: 42 }} /></View><View style={[styles.taskBanner, { backgroundColor: colors.surface, borderColor: colors.border }]}><Text style={[styles.taskLabel, { color: colors.muted }]}>CURRENT TASK</Text><Text style={[styles.taskTitle, { color: colors.text }]} numberOfLines={2}>{task.title}</Text><Text style={[styles.taskSubject, { color: colors.primary }]}>{task.subject}</Text></View><View style={[styles.timerCard, { backgroundColor: colors.primary }]}><View style={[styles.timerHalo, { borderColor: colors.accent }]}><View style={[styles.timerInner, { backgroundColor: colors.primaryDark }]}><Text style={styles.timerLabel}>{completed ? "DONE" : isRunning ? "FOCUSING" : "READY"}</Text><Text style={styles.timer}>{minutes}:{seconds}</Text><Text style={styles.timerHint}>{Math.round(progress * 100)}% complete</Text></View></View><View style={styles.timerActions}><PrimaryButton label={completed ? "Session complete" : isRunning ? "Pause timer" : hasStarted ? "Resume timer" : "Start focus session"} onPress={handleStart} disabled={completed} variant={completed ? "outline" : "primary"} /><Pressable accessibilityRole="button" onPress={handleReset} style={({ pressed }) => [styles.resetButton, pressed && styles.pressed]}><Text style={styles.resetText}>Reset timer</Text></Pressable></View></View><Text style={[styles.sectionTitle, { color: colors.text }]}>Choose a focus block</Text><Text style={[styles.sectionHint, { color: colors.muted }]}>Pick a pace that fits your next study session.</Text><View style={styles.presetRow}>{PRESETS.map((value) => <Pressable key={value} disabled={hasStarted && !completed} onPress={() => handlePreset(value)} style={({ pressed }) => [styles.preset, { backgroundColor: selectedMinutes === value ? colors.accent : colors.surface, borderColor: selectedMinutes === value ? colors.primary : colors.border }, pressed && styles.pressed, hasStarted && !completed && styles.disabled]}><Text style={[styles.presetValue, { color: selectedMinutes === value ? colors.primary : colors.text }]}>{value}</Text><Text style={[styles.presetLabel, { color: colors.muted }]}>min</Text></Pressable>)}</View>{hasStarted && !completed ? <Pressable accessibilityRole="button" onPress={handleFinish} style={({ pressed }) => [styles.finishButton, { borderColor: colors.success }, pressed && styles.pressed]}><Text style={[styles.finishText, { color: colors.success }]}>Finish session early</Text></Pressable> : null}<Text style={[styles.motivation, { color: colors.muted }]}>{completed ? "Great work. Your focus session was added to this week’s summary." : "Small focused steps add up to big progress."}</Text></ScrollView></SafeAreaView>;
+  return <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}><ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}><View style={styles.header}><Pressable accessibilityRole="button" accessibilityLabel="Go back" onPress={() => navigation.goBack()} style={({ pressed }) => [styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && styles.pressed]}><Text style={[styles.backIcon, { color: colors.primary }]}>‹</Text></Pressable><View><Text style={[styles.eyebrow, { color: colors.primary }]}>FOCUS MODE</Text><Text style={[styles.headerTitle, { color: colors.text }]}>Study timer</Text></View><View style={{ width: 42 }} /></View><View style={[styles.taskBanner, { backgroundColor: colors.surface, borderColor: colors.border }]}><Text style={[styles.taskLabel, { color: colors.muted }]}>CURRENT TASK</Text><Text style={[styles.taskTitle, { color: colors.text }]} numberOfLines={2}>{task.title}</Text><Text style={[styles.taskSubject, { color: colors.primary }]}>{task.subject}</Text></View><View style={[styles.timerCard, { backgroundColor: colors.primary }]}><View style={[styles.timerHalo, { borderColor: colors.accent }]}><View style={[styles.timerInner, { backgroundColor: colors.primaryDark }]}><Text style={styles.timerLabel}>{completed ? "DONE" : isRunning ? "FOCUSING" : "READY"}</Text><Text style={styles.timer}>{minutes}:{seconds}</Text><Text style={styles.timerHint}>{Math.round(progress * 100)}% complete</Text></View></View><View style={styles.timerActions}><PrimaryButton label={completed ? "Session complete" : isRunning ? "Pause timer" : hasStarted ? "Resume timer" : "Start focus session"} onPress={handleStart} disabled={completed} variant={completed ? "outline" : "primary"} /><Pressable accessibilityRole="button" onPress={handleReset} style={({ pressed }) => [styles.resetButton, pressed && styles.pressed]}><Text style={styles.resetText}>Reset timer</Text></Pressable></View></View><Text style={[styles.sectionTitle, { color: colors.text }]}>Choose a focus block</Text><Text style={[styles.sectionHint, { color: colors.muted }]}>Pick a pace that fits your next study session.</Text><View style={styles.presetRow}>{PRESETS.map((value) => <Pressable key={value} disabled={hasStarted && !completed} onPress={() => handlePreset(value)} style={({ pressed }) => [styles.preset, { backgroundColor: selectedMinutes === value ? colors.accent : colors.surface, borderColor: selectedMinutes === value ? colors.primary : colors.border }, pressed && styles.pressed, hasStarted && !completed && styles.disabled]}><Text style={[styles.presetValue, { color: selectedMinutes === value ? colors.primary : colors.text }]}>{value}</Text><Text style={[styles.presetLabel, { color: colors.muted }]}>min</Text></Pressable>)}</View>{hasStarted && !completed ? <Pressable accessibilityRole="button" onPress={handleFinish} style={({ pressed }) => [styles.finishButton, { borderColor: colors.success }, pressed && styles.pressed]}><Text style={[styles.finishText, { color: colors.success }]}>Finish session early</Text></Pressable> : null}<Text style={[styles.motivation, { color: colors.muted }]}>{completed ? "Great work. Your focus session was added to this week’s summary." : "Small focused steps add up to big progress."}</Text></ScrollView><CelebrationOverlay visible={celebrationVisible} title="Focus complete!" message={`Nice work on ${task.title}. Your session was added to this week's summary.`} onClose={() => setCelebrationVisible(false)} /></SafeAreaView>;
 }
 
 const styles = StyleSheet.create({

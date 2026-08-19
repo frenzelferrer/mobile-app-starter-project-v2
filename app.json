@@ -31,7 +31,8 @@
           "image": "./assets/branding/tuonta-logo.png",
           "imageWidth": 220
         }
-      ]
+      ],
+      "expo-notifications"
     ]
   }
 }

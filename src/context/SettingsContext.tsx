@@ -12,6 +12,8 @@ export interface ProfileSettings {
   studentNumber: string;
   darkMode: boolean;
   onboardingComplete: boolean;
+  remindersEnabled: boolean;
+  completionFeedbackEnabled: boolean;
 }
 
 interface SettingsContextValue {
@@ -30,6 +32,8 @@ const defaultSettings: ProfileSettings = {
   studentNumber: "2025XXXXX",
   darkMode: false,
   onboardingComplete: false,
+  remindersEnabled: true,
+  completionFeedbackEnabled: true,
 };
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);

@@ -1,6 +1,6 @@
 # TuonTa!
 
-**TuonTa!** is a React Native + TypeScript student task-management app for Midterm Task No. 4. It helps students track assignments, quizzes, projects, and deadlines through a dashboard, searchable task list, validated forms, task details, editing, completion status, deletion, and a profile screen.
+**TuonTa!** is a React Native + TypeScript student task-management app for Midterm Task No. 4. It helps students track assignments, quizzes, projects, and deadlines through a dashboard, searchable task list, validated forms, task details, editing, completion status, deletion, and a profile screen. It also includes local deadline reminders and an optional completion celebration with confetti animation and success haptics.
 
 The project is intentionally local-only. It does not use a backend, Firebase, Supabase, Express, or a database. Task data is shared through a small React Context and starts from a parsed JSON string so the core React Native and TypeScript concepts remain easy to explain.
 
@@ -71,13 +71,21 @@ To install an APK with ADB:
 adb install .\\tuonta.apk
 ```
 
-The APK is standalone and does not require `npm start`, Metro, or Expo Go. EAS reads the TuonTa! icon, splash logo, favicon configuration, and app metadata from the repository during the build.
+The APK is standalone and does not require `npm start`, Metro, or Expo Go. EAS reads the TuonTa! icon, splash logo, favicon configuration, and app metadata from the repository during the build. Because deadline notifications and haptics are native capabilities, create a new EAS APK after pulling this feature update before testing those behaviors on a phone. Browser/web testing can verify the rest of the interface, but it cannot display device notifications or physical haptics.
 
 The screens use `react-native-safe-area-context` through `SafeAreaProvider` so headers and forms clear Android status bars when edge-to-edge rendering is enabled. Home header controls are constrained for narrow phone widths, while the Tasks and Profile screens retain scrollable responsive layouts. After any layout change, a new APK build is required to test the native result on a physical device.
 
 ## Main features
 
-The app includes an animated first-launch name greeting, a dashboard with computed total, completed, pending, high-priority, completion-percentage, and weekly productivity statistics, and a Tasks tab with search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, start a task-linked Focus Study Timer, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Tasks area also includes a grouped deadline Timeline. The Profile tab contains persisted student details and a reset-to-sample-data action, while the Home screen provides the clickable moon/sun dark-mode control.
+The app includes an animated first-launch name greeting, a dashboard with computed total, completed, pending, high-priority, completion-percentage, and weekly productivity statistics, and a Tasks tab with search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, start a task-linked Focus Study Timer, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Tasks area also includes a grouped deadline Timeline. The Profile tab contains persisted student details and a reset-to-sample-data action, while the Home screen provides the clickable moon/sun dark-mode control. Pending tasks can optionally schedule a local reminder for the day before the deadline, and tasks or focus sessions can show a confetti celebration overlay with a success haptic when completed.
+
+## Local reminders and completion feedback
+
+TuonTa! uses `expo-notifications` for **local, on-device deadline reminders**. No server, account, or external API is involved. On Android, the app creates a `Task deadlines` notification channel. When the user enables **Deadline reminders** from Profile, TuonTa! requests notification permission, then resynchronizes all pending tasks: each task receives a reminder one day before its due date when that time is still in the future; if the one-day window has already passed, the app schedules the reminder for the due-date morning when possible. Completed tasks are excluded, and changing, deleting, or completing tasks causes the pending schedule to be rebuilt.
+
+The Profile screen also includes **Celebration feedback**, enabled by default. When enabled, marking a task complete or finishing a focus session opens a short confetti animation overlay and triggers the platform success haptic through `expo-haptics`. The overlay dismisses automatically or can be closed with **Keep going**. Both settings are persisted locally with AsyncStorage. Notifications and haptics require an Android/iOS development build or standalone APK; they are not available in a normal browser export.
+
+The new runtime dependencies are `expo-notifications` for local scheduling and `expo-haptics` for tactile completion feedback. The `expo-notifications` config plugin is included in `app.json`, so EAS includes the required native configuration in future builds.
 
 ## Navigation structure
 
@@ -111,6 +119,7 @@ assets/
     └── tuonta-logo.png
 src/
 ├── components/
+│   ├── CelebrationOverlay.tsx
 │   ├── FormInput.tsx
 │   ├── PrimaryButton.tsx
 │   ├── StatCard.tsx
@@ -118,6 +127,7 @@ src/
 │   └── TaskForm.tsx
 ├── context/
 │   ├── FocusContext.tsx
+│   ├── ReminderContext.tsx
 │   ├── SettingsContext.tsx
 │   └── TaskContext.tsx
 ├── data/
@@ -152,7 +162,7 @@ The official supplied assets are stored in `assets/branding/`. The square `tuont
 
 `src/data/mockTasks.ts` stores five realistic academic records in a JSON string. `parseMockTasks()` calls `JSON.parse()`, checks the parsed structure, and returns typed `Task` records. `TaskProvider` calls that parser in `useEffect` and exposes a short loading state so `ActivityIndicator` is visible during startup.
 
-`src/context/TaskContext.tsx` manages the shared task collection with `useState`, hydrates saved records from AsyncStorage, and persists every CRUD change. It exposes `addTask`, `updateTask`, `deleteTask`, `toggleTaskStatus`, `resetTasks`, and `getTaskById`. `src/context/SettingsContext.tsx` persists profile fields and the dark-mode preference. `src/components/TaskForm.tsx` owns controlled input state with `useState` and uses `src/utils/validation.ts` for the shared Add/Edit validation rules. The same utility calculates Overdue, Due today, Due soon, and Upcoming labels from real dates.
+`src/context/TaskContext.tsx` manages the shared task collection with `useState`, hydrates saved records from AsyncStorage, and persists every CRUD change. It exposes `addTask`, `updateTask`, `deleteTask`, `toggleTaskStatus`, `resetTasks`, and `getTaskById`. `src/context/SettingsContext.tsx` persists profile fields, the dark-mode preference, the deadline-reminder toggle, and the completion-feedback toggle. `src/context/ReminderContext.tsx` requests permission and rebuilds local notification schedules from current pending tasks whenever task or reminder settings change. `src/components/CelebrationOverlay.tsx` provides the reusable animated confetti and success-feedback surface. `src/components/TaskForm.tsx` owns controlled input state with `useState` and uses `src/utils/validation.ts` for the shared Add/Edit validation rules. The same utility calculates Overdue, Due today, Due soon, and Upcoming labels from real dates.
 
 ## Validation rules
 
@@ -192,6 +202,8 @@ A title is required and must contain at least three characters. Subject and desc
 | Progress tracking | `HomeScreen.tsx` calculates and displays completion percentage |
 | First-launch onboarding | `WelcomeScreen.tsx`, `SettingsContext.tsx`, and `App.tsx` |
 | Dark mode | Home-screen moon/sun icon, `SettingsContext.tsx`, `App.tsx`, and theme-aware screens/components |
+| Local deadline reminders | `ReminderContext.tsx`, `expo-notifications`, Profile permission toggle, and `app.json` plugin |
+| Completion feedback | `CelebrationOverlay.tsx`, Focus Timer, Task Details, `expo-haptics`, and Profile toggle |
 
 ## Local verification checklist
 
@@ -201,6 +213,6 @@ Run a type check before presenting the project:
 npx tsc --noEmit
 ```
 
-Then manually verify the following flow: clear the app’s local data or use Reset sample data to return to onboarding; confirm the animated welcome screen appears; type a name and watch the greeting preview update; try to continue with an invalid name; submit a valid name and confirm the success transition opens the dashboard; close and reopen the app to verify onboarding is skipped; edit the saved name from Profile and confirm Home updates; search, filter, and sort the sample tasks; open Timeline and select a grouped deadline; inspect overdue/due-soon labels; open a task and confirm its details; start a Focus Study Timer, pause it, resume it, finish it early, and confirm the weekly focus summary updates; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; tap the Home-screen moon/sun icon to toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts, weekly metrics, timeline groups, and list badges should update immediately after each state change.
+Then manually verify the following flow: clear the app’s local data or use Reset sample data to return to onboarding; confirm the animated welcome screen appears; type a name and watch the greeting preview update; try to continue with an invalid name; submit a valid name and confirm the success transition opens the dashboard; close and reopen the app to verify onboarding is skipped; edit the saved name from Profile and confirm Home updates; search, filter, and sort the sample tasks; open Timeline and select a grouped deadline; inspect overdue/due-soon labels; open a task and confirm its details; start a Focus Study Timer, pause it, resume it, finish it early, and confirm the weekly focus summary updates; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; tap the Home-screen moon/sun icon to toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts, weekly metrics, timeline groups, and list badges should update immediately after each state change. On a physical device or native emulator, open Profile and enable **Deadline reminders**, grant notification permission, create or edit a pending task with a future due date, and confirm the Profile card reports a scheduled reminder; then complete or delete the task and confirm the schedule count updates. Toggle **Celebration feedback** off and on, mark a pending task complete, and finish a Focus Timer session early to confirm the confetti overlay and success haptic appear only when enabled. Rebuild with EAS after pulling the final commit when testing native notifications or haptics; web export does not provide those device capabilities.
 
-The placeholder profile values are in `src/screens/ProfileScreen.tsx` and can be replaced with the student’s actual name, course, year level, and student number.
+The placeholder profile values are in `src/screens/ProfileScreen.tsx` and can be replaced with the student’s actual name, course, year level, and student number. The reminder schedule is intentionally local-only and is rebuilt from the current AsyncStorage task list; it is not a cloud push-notification service.
