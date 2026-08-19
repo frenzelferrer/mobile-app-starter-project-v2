@@ -8,6 +8,7 @@
     "scheme": "tuonta",
     "userInterfaceStyle": "automatic",
     "ios": {
+      "bundleIdentifier": "com.gabri.tuonta",
       "supportsTablet": true,
       "icon": "./assets/branding/tuonta-icon.png"
     },
