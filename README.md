@@ -6,7 +6,7 @@ The project is intentionally local-only. It does not use a backend, Firebase, Su
 
 ## TuonTa! website and APK
 
-Read about TuonTa! and access the installation instructions through the official project website: [https://tuon-ta-website.vercel.app/](https://tuon-ta-website.vercel.app/). The website includes a **Download APK** button for installing the Android application directly.
+Read about TuonTa! and access the installation instructions through the official project website: [https://tuon-ta-website.vercel.app/](https://tuon-ta-website.vercel.app/). The website includes a **Download APK** button for installing the Android application directly if you want to try and test it in your phone device.
 
 The direct GitHub release asset is also available here: [Download TuonTa! APK](https://github.com/frenzelferrer/mobile-app-starter-project-v2/releases/download/v1.0.0/TuonTa.apk).
 
