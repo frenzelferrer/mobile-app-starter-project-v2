@@ -21,7 +21,7 @@ npm run ios
 npm run web
 ```
 
-The Android and iOS commands require the corresponding emulator/simulator or a connected device. The web command is useful for quickly checking navigation and form behavior in a browser. The project scripts set the required Expo compatibility flag because the Expo CLI bundles Expo Router transitively, while this application intentionally uses direct React Navigation.
+The Android and iOS commands require the corresponding emulator/simulator or a connected device. The web command is useful for quickly checking navigation and form behavior in a browser. The project scripts set the required Expo compatibility flag because the Expo CLI bundles Expo Router transitively, while this application intentionally uses direct React Navigation. On Windows, `scripts/start-expo.cjs` launches the `.cmd` executable through the native shell, so `npm start` works without manually setting environment variables.
 
 ## Main features
 
