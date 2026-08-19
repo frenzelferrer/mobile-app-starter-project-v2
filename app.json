@@ -7,6 +7,11 @@
     "icon": "./assets/branding/tuonta-icon.png",
     "scheme": "tuonta",
     "userInterfaceStyle": "automatic",
+    "extra": {
+      "eas": {
+        "projectId": "d726618c-8ccf-477b-9bef-cf279fcf368e"
+      }
+    },
     "ios": {
       "bundleIdentifier": "com.gabri.tuonta",
       "supportsTablet": true,
