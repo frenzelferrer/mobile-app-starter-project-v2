@@ -1,29 +1,16 @@
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, type Theme } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 
+import { SettingsProvider, useSettings } from "@/context/SettingsContext";
 import { TaskProvider } from "@/context/TaskContext";
 import { AppNavigator } from "@/navigation/AppNavigator";
-import { colors } from "@/theme/colors";
 
-const navigationTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: colors.background,
-    card: colors.surface,
-    text: colors.text,
-    primary: colors.primary,
-    border: colors.border,
-  },
-};
+function AppShell() {
+  const { colors, settings } = useSettings();
+  const navigationTheme: Theme = { ...DefaultTheme, dark: settings.darkMode, colors: { ...DefaultTheme.colors, background: colors.background, card: colors.surface, text: colors.text, primary: colors.primary, border: colors.border, notification: colors.primary } };
+  return <NavigationContainer theme={navigationTheme}><StatusBar style={settings.darkMode ? "light" : "dark"} /><AppNavigator /></NavigationContainer>;
+}
 
 export default function App() {
-  return (
-    <TaskProvider>
-      <NavigationContainer theme={navigationTheme}>
-        <StatusBar style="dark" />
-        <AppNavigator />
-      </NavigationContainer>
-    </TaskProvider>
-  );
+  return <SettingsProvider><TaskProvider><AppShell /></TaskProvider></SettingsProvider>;
 }

@@ -25,7 +25,7 @@ The Android and iOS commands require the corresponding emulator/simulator or a c
 
 ## Main features
 
-The app includes a dashboard with computed total, completed, pending, and high-priority task statistics. The Tasks tab provides search, a `FlatList`, an empty state, a filter `Modal`, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains easy-to-replace student placeholder information and app metadata.
+The app includes a dashboard with computed total, completed, pending, high-priority, and completion-percentage statistics. The Tasks tab provides search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains persisted student details, a dark-mode toggle, and a reset-to-sample-data action.
 
 ## Navigation structure
 
@@ -58,6 +58,7 @@ src/
 │   ├── TaskCard.tsx
 │   └── TaskForm.tsx
 ├── context/
+│   ├── SettingsContext.tsx
 │   └── TaskContext.tsx
 ├── data/
 │   └── mockTasks.ts
@@ -83,7 +84,7 @@ src/
 
 `src/data/mockTasks.ts` stores five realistic academic records in a JSON string. `parseMockTasks()` calls `JSON.parse()`, checks the parsed structure, and returns typed `Task` records. `TaskProvider` calls that parser in `useEffect` and exposes a short loading state so `ActivityIndicator` is visible during startup.
 
-`src/context/TaskContext.tsx` manages the shared task collection with `useState` and exposes `addTask`, `updateTask`, `deleteTask`, `toggleTaskStatus`, and `getTaskById`. `src/components/TaskForm.tsx` owns controlled input state with `useState` and uses `src/utils/validation.ts` for the shared Add/Edit validation rules.
+`src/context/TaskContext.tsx` manages the shared task collection with `useState`, hydrates saved records from AsyncStorage, and persists every CRUD change. It exposes `addTask`, `updateTask`, `deleteTask`, `toggleTaskStatus`, `resetTasks`, and `getTaskById`. `src/context/SettingsContext.tsx` persists profile fields and the dark-mode preference. `src/components/TaskForm.tsx` owns controlled input state with `useState` and uses `src/utils/validation.ts` for the shared Add/Edit validation rules. The same utility calculates Overdue, Due today, Due soon, and Upcoming labels from real dates.
 
 ## Validation rules
 
@@ -117,7 +118,11 @@ A title is required and must contain at least three characters. Subject and desc
 | Read | Home statistics, Task List, and Task Details |
 | Update | `EditTaskScreen.tsx`, status toggle, and `TaskContext.updateTask()` |
 | Delete | `TaskDetailsScreen.tsx` and `TaskContext.deleteTask()` |
-| Six screens | Home, Task List, Add, Details, Edit, and Profile |
+| `Six screens` | Home, Task List, Add, Details, Edit, and Profile |
+| Local persistence | `TaskContext.tsx` and `SettingsContext.tsx` use AsyncStorage |
+| Sorting | `TaskListScreen.tsx` cycles through due date, priority, and newest |
+| Progress tracking | `HomeScreen.tsx` calculates and displays completion percentage |
+| Dark mode | `SettingsContext.tsx`, `App.tsx`, and theme-aware screens/components |
 
 ## Local verification checklist
 
@@ -127,6 +132,6 @@ Run a type check before presenting the project:
 npx tsc --noEmit
 ```
 
-Then manually verify the following flow: wait for initial loading to finish; search and filter the five sample tasks; open a task and confirm its details; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; cancel a delete confirmation; and confirm a delete. The dashboard counts and list badges should update immediately after each state change.
+Then manually verify the following flow: wait for saved data to restore; search, filter, and sort the sample tasks; inspect overdue/due-soon labels; open a task and confirm its details; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; close and reopen the app to verify persistence; toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts and list badges should update immediately after each state change.
 
 The placeholder profile values are in `src/screens/ProfileScreen.tsx` and can be replaced with the student’s actual name, course, year level, and student number.
