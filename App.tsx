@@ -1,5 +1,6 @@
 import { NavigationContainer, DefaultTheme, type Theme } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { SettingsProvider, useSettings } from "@/context/SettingsContext";
 import { TaskProvider } from "@/context/TaskContext";
@@ -12,5 +13,5 @@ function AppShell() {
 }
 
 export default function App() {
-  return <SettingsProvider><TaskProvider><AppShell /></TaskProvider></SettingsProvider>;
+  return <SafeAreaProvider><SettingsProvider><TaskProvider><AppShell /></TaskProvider></SettingsProvider></SafeAreaProvider>;
 }

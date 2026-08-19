@@ -61,6 +61,8 @@ adb install .\\tuonta.apk
 
 The APK is standalone and does not require `npm start`, Metro, or Expo Go. EAS reads the TuonTa! icon, splash logo, favicon configuration, and app metadata from the repository during the build.
 
+The screens use `react-native-safe-area-context` through `SafeAreaProvider` so headers and forms clear Android status bars when edge-to-edge rendering is enabled. Home header controls are constrained for narrow phone widths, while the Tasks and Profile screens retain scrollable responsive layouts. After any layout change, a new APK build is required to test the native result on a physical device.
+
 ## Main features
 
 The app includes a dashboard with computed total, completed, pending, high-priority, and completion-percentage statistics. The Tasks tab provides search, sorting by due date/priority/newest, a `FlatList`, an empty state, a filter `Modal`, due-date urgency badges, and navigation to details. Users can create tasks through a validated form, inspect complete details, mark tasks pending or completed, edit records, and delete them with an `Alert` confirmation. The Profile tab contains persisted student details, a dark-mode toggle, and a reset-to-sample-data action.

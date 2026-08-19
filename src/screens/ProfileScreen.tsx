@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Alert, Button, Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Button, Image, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
 import { useSettings } from "@/context/SettingsContext";
