@@ -169,7 +169,7 @@ A title is required and must contain at least three characters. Subject and desc
 | Local persistence | `TaskContext.tsx` and `SettingsContext.tsx` use AsyncStorage |
 | Sorting | `TaskListScreen.tsx` cycles through due date, priority, and newest |
 | Progress tracking | `HomeScreen.tsx` calculates and displays completion percentage |
-| Dark mode | `SettingsContext.tsx`, `App.tsx`, and theme-aware screens/components |
+| Dark mode | Home-screen moon/sun icon, `SettingsContext.tsx`, `App.tsx`, and theme-aware screens/components |
 
 ## Local verification checklist
 
@@ -179,6 +179,6 @@ Run a type check before presenting the project:
 npx tsc --noEmit
 ```
 
-Then manually verify the following flow: wait for saved data to restore; search, filter, and sort the sample tasks; inspect overdue/due-soon labels; open a task and confirm its details; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; close and reopen the app to verify persistence; toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts and list badges should update immediately after each state change.
+Then manually verify the following flow: wait for saved data to restore; search, filter, and sort the sample tasks; inspect overdue/due-soon labels; open a task and confirm its details; create a valid task; attempt an invalid submission and read the inline errors; edit the task; mark it completed; confirm the progress percentage changes; close and reopen the app to verify persistence; tap the Home-screen moon/sun icon to toggle dark mode; cancel a delete confirmation; and confirm a delete. The dashboard counts and list badges should update immediately after each state change.
 
 The placeholder profile values are in `src/screens/ProfileScreen.tsx` and can be replaced with the student’s actual name, course, year level, and student number.
