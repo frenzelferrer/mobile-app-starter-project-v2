@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Platform, StyleSheet, View } from "react-native";
 
 import { useSettings } from "@/context/SettingsContext";
 import { AddTaskScreen } from "@/screens/AddTaskScreen";
@@ -23,7 +24,15 @@ function TasksStackNavigator() {
 
 export function AppNavigator() {
   const { colors } = useSettings();
-  return <Tab.Navigator screenOptions={{ headerShown: false, tabBarActiveTintColor: colors.primary, tabBarInactiveTintColor: colors.muted, tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border, height: 66, paddingBottom: 10, paddingTop: 8 }, tabBarLabelStyle: { fontSize: 11, fontWeight: "700" } }}><Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: "Home", tabBarIcon: ({ color }) => <TabIcon symbol="⌂" color={color} /> }} /><Tab.Screen name="Tasks" component={TasksStackNavigator} options={{ tabBarLabel: "Tasks", tabBarIcon: ({ color }) => <TabIcon symbol="✓" color={color} /> }} /><Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Profile", tabBarIcon: ({ color }) => <TabIcon symbol="◉" color={color} /> }} /></Tab.Navigator>;
+  return <Tab.Navigator screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true, tabBarActiveTintColor: colors.primary, tabBarInactiveTintColor: colors.muted, tabBarActiveBackgroundColor: colors.accent, tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border, borderTopWidth: StyleSheet.hairlineWidth, height: Platform.select({ ios: 84, android: 72, default: 72 }), paddingBottom: Platform.select({ ios: 18, android: 9, default: 9 }), paddingTop: 8, elevation: 0, shadowOpacity: 0 }, tabBarItemStyle: { marginHorizontal: 6, borderRadius: 14 }, tabBarLabelStyle: { fontSize: 11, fontWeight: "800", marginTop: 1 }, tabBarIconStyle: { marginTop: 1 } }}><Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: "Home", tabBarAccessibilityLabel: "Home", tabBarIcon: ({ color, focused }) => <TabIcon name={focused ? "home" : "home-outline"} color={color} focused={focused} /> }} /><Tab.Screen name="Tasks" component={TasksStackNavigator} options={{ tabBarLabel: "Tasks", tabBarAccessibilityLabel: "Tasks", tabBarIcon: ({ color, focused }) => <TabIcon name={focused ? "checkmark-done" : "checkmark-done-outline"} color={color} focused={focused} /> }} /><Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: "Profile", tabBarAccessibilityLabel: "Profile", tabBarIcon: ({ color, focused }) => <TabIcon name={focused ? "person" : "person-outline"} color={color} focused={focused} /> }} /></Tab.Navigator>;
 }
 
-function TabIcon({ symbol, color }: { symbol: string; color: string }) { return <Text style={{ color, fontSize: 20 }}>{symbol}</Text>; }
+/** TuonTa! lower-navigation icon: clean, legible, and visibly selected without visual noise. */
+function TabIcon({ name, color, focused }: { name: keyof typeof Ionicons.glyphMap; color: string; focused: boolean }) {
+  return <View style={[styles.tabIcon, focused && styles.tabIconActive]}><Ionicons name={name} color={color} size={focused ? 21 : 20} /></View>;
+}
+
+const styles = StyleSheet.create({
+  tabIcon: { alignItems: "center", justifyContent: "center", height: 24, minWidth: 24 },
+  tabIconActive: { transform: [{ translateY: -1 }] },
+});
