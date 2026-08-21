@@ -1,5 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Animated,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FormInput } from "@/components/FormInput";
@@ -14,15 +24,52 @@ function validateName(value: string) {
   return undefined;
 }
 
+interface TutorialSlide {
+  emoji: string;
+  title: string;
+  description: string;
+}
+
+const TUTORIAL_SLIDES: TutorialSlide[] = [
+  {
+    emoji: "📝",
+    title: "Organize Your Tasks",
+    description:
+      "Add your assignments, quizzes, and exams. Assign subjects, priority levels, recurrence patterns, and custom reminders so you never miss a deadline.",
+  },
+  {
+    emoji: "⏱️",
+    title: "Focused Study Sessions",
+    description:
+      "Tackle tasks using custom single-session focus timers (up to 180 min) or use the Pomodoro mode (25-min work blocks + break periods) to build study habits.",
+  },
+  {
+    emoji: "🔥",
+    title: "Insights & Momentum",
+    description:
+      "View your study streak, monitor your weekly progress, and analyze focus breakdowns by subject to stay motivated.",
+  },
+  {
+    emoji: "⚡",
+    title: "Quick Swipe Actions",
+    description:
+      "Manage tasks instantly from your task list. Swipe right to mark a task as completed, or swipe left to delete it.",
+  },
+];
+
 export function WelcomeScreen() {
   const { colors, updateSettings } = useSettings();
+  const [step, setStep] = useState<"name" | "tutorial">("name");
+  const [activeSlide, setActiveSlide] = useState(0);
   const [name, setName] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
   const fade = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.88)).current;
   const float = useRef(new Animated.Value(0)).current;
   const successScale = useRef(new Animated.Value(1)).current;
+  const slideFade = useRef(new Animated.Value(1)).current;
 
   const normalizedName = useMemo(() => name.trim().replace(/\s+/g, " "), [name]);
   const nameError = hasSubmitted ? validateName(name) : undefined;
@@ -55,8 +102,29 @@ export function WelcomeScreen() {
       Animated.timing(successScale, { toValue: 1.03, duration: 160, useNativeDriver: true }),
       Animated.timing(successScale, { toValue: 1, duration: 130, useNativeDriver: true }),
     ]).start(() => {
-      updateSettings({ name: normalizedName, onboardingComplete: true });
+      setIsSaving(false);
+      setStep("tutorial");
     });
+  };
+
+  const handleNextSlide = () => {
+    if (activeSlide < TUTORIAL_SLIDES.length - 1) {
+      Animated.timing(slideFade, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => {
+        setActiveSlide((prev) => prev + 1);
+        Animated.timing(slideFade, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+      });
+    } else {
+      updateSettings({ name: normalizedName, onboardingComplete: true });
+    }
+  };
+
+  const handlePrevSlide = () => {
+    if (activeSlide > 0) {
+      Animated.timing(slideFade, { toValue: 0, duration: 150, useNativeDriver: true }).start(() => {
+        setActiveSlide((prev) => prev - 1);
+        Animated.timing(slideFade, { toValue: 1, duration: 200, useNativeDriver: true }).start();
+      });
+    }
   };
 
   return (
@@ -67,75 +135,144 @@ export function WelcomeScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Animated.View style={[styles.container, { opacity: fade, transform: [{ scale }] }]}>
-            <View style={styles.brandRow}>
-              <View style={[styles.brandMark, { backgroundColor: colors.accent }]}>
-                <Text style={[styles.brandMarkText, { color: colors.primary }]}>T</Text>
+          {step === "name" ? (
+            <Animated.View style={[styles.container, { opacity: fade, transform: [{ scale }] }]}>
+              <View style={styles.brandRow}>
+                <View style={[styles.brandMark, { backgroundColor: colors.accent }]}>
+                  <Text style={[styles.brandMarkText, { color: colors.primary }]}>T</Text>
+                </View>
+                <Text style={[styles.brandName, { color: colors.primary }]}>TuonTa!</Text>
               </View>
-              <Text style={[styles.brandName, { color: colors.primary }]}>TuonTa!</Text>
-            </View>
 
-            <Animated.View style={[styles.hero, { transform: [{ translateY: float }] }]}>
-              <View style={[styles.orbit, styles.orbitOne, { borderColor: colors.accent }]} />
-              <View style={[styles.orbit, styles.orbitTwo, { borderColor: colors.primary }]} />
-              <View style={[styles.logoBackdrop, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Image
-                  source={require("../../assets/branding/tuonta-icon.png")}
-                  style={styles.logo}
-                  resizeMode="contain"
-                  accessibilityLabel="TuonTa! app icon"
+              <Animated.View style={[styles.hero, { transform: [{ translateY: float }] }]}>
+                <View style={[styles.orbit, styles.orbitOne, { borderColor: colors.accent }]} />
+                <View style={[styles.orbit, styles.orbitTwo, { borderColor: colors.primary }]} />
+                <View style={[styles.logoBackdrop, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  <Image
+                    source={require("../../assets/branding/tuonta-icon.png")}
+                    style={styles.logo}
+                    resizeMode="contain"
+                    accessibilityLabel="TuonTa! app icon"
+                  />
+                </View>
+                <View style={[styles.accentDot, { backgroundColor: colors.success }]} />
+                <View style={[styles.accentDotSmall, { backgroundColor: colors.primary }]} />
+              </Animated.View>
+
+              <Text style={[styles.eyebrow, { color: colors.primary }]}>A BETTER WAY TO BEGIN</Text>
+              <Text style={[styles.title, { color: colors.text }]}>Make your next move count.</Text>
+              <Text style={[styles.subtitle, { color: colors.muted }]}>
+                TuonTa! keeps your academic goals clear, organized, and moving forward.
+              </Text>
+
+              <Animated.View
+                style={[
+                  styles.greetingCard,
+                  { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: successScale }] },
+                ]}
+              >
+                <Text style={[styles.greetingLabel, { color: colors.muted }]}>YOUR PERSONAL GREETING</Text>
+                <Text style={[styles.greeting, { color: colors.text }]} numberOfLines={2}>
+                  {greeting}
+                </Text>
+                <Text style={[styles.greetingHint, { color: colors.muted }]}>Let’s make progress together.</Text>
+              </Animated.View>
+
+              <View style={styles.formBlock}>
+                <FormInput
+                  autoCapitalize="words"
+                  autoCorrect={false}
+                  label="What should we call you?"
+                  maxLength={32}
+                  onChangeText={(value) => {
+                    setName(value);
+                    if (hasSubmitted) setHasSubmitted(false);
+                  }}
+                  onSubmitEditing={handleContinue}
+                  placeholder="Enter your name"
+                  returnKeyType="done"
+                  value={name}
+                  error={nameError}
+                />
+                <PrimaryButton
+                  disabled={!isValid}
+                  label={isSaving ? "Preparing your space..." : "Enter TuonTa!"}
+                  loading={isSaving}
+                  onPress={handleContinue}
                 />
               </View>
-              <View style={[styles.accentDot, { backgroundColor: colors.success }]} />
-              <View style={[styles.accentDotSmall, { backgroundColor: colors.primary }]} />
+
+              <Text style={[styles.tagline, { color: colors.primary }]}>Tuon ta, human ta.</Text>
+              <Text style={[styles.footer, { color: colors.muted }]}>Your tasks, your pace, your progress.</Text>
             </Animated.View>
+          ) : (
+            <Animated.View style={[styles.container, { opacity: fade }]}>
+              <View style={styles.brandRow}>
+                <View style={[styles.brandMark, { backgroundColor: colors.accent }]}>
+                  <Text style={[styles.brandMarkText, { color: colors.primary }]}>T</Text>
+                </View>
+                <Text style={[styles.brandName, { color: colors.primary }]}>TuonTa!</Text>
+              </View>
 
-            <Text style={[styles.eyebrow, { color: colors.primary }]}>A BETTER WAY TO BEGIN</Text>
-            <Text style={[styles.title, { color: colors.text }]}>Make your next move count.</Text>
-            <Text style={[styles.subtitle, { color: colors.muted }]}>
-              TuonTa! keeps your academic goals clear, organized, and moving forward.
-            </Text>
+              <Text style={[styles.eyebrow, { color: colors.primary, marginTop: spacing.md }]}>QUICK TUTORIAL</Text>
+              <Text style={[styles.title, { color: colors.text }]}>How to use the app</Text>
 
-            <Animated.View
-              style={[
-                styles.greetingCard,
-                { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: successScale }] },
-              ]}
-            >
-              <Text style={[styles.greetingLabel, { color: colors.muted }]}>YOUR PERSONAL GREETING</Text>
-              <Text style={[styles.greeting, { color: colors.text }]} numberOfLines={2}>
-                {greeting}
-              </Text>
-              <Text style={[styles.greetingHint, { color: colors.muted }]}>Let’s make progress together.</Text>
+              <Animated.View
+                style={[
+                  styles.slideCard,
+                  { backgroundColor: colors.surface, borderColor: colors.border, opacity: slideFade },
+                ]}
+              >
+                <Text style={styles.slideEmoji}>{TUTORIAL_SLIDES[activeSlide].emoji}</Text>
+                <Text style={[styles.slideTitle, { color: colors.text }]}>{TUTORIAL_SLIDES[activeSlide].title}</Text>
+                <Text style={[styles.slideDescription, { color: colors.muted }]}>
+                  {TUTORIAL_SLIDES[activeSlide].description}
+                </Text>
+              </Animated.View>
+
+              {/* Progress Indicator dots */}
+              <View style={styles.indicatorRow}>
+                {TUTORIAL_SLIDES.map((_, idx) => (
+                  <View
+                    key={idx}
+                    style={[
+                      styles.indicatorDot,
+                      {
+                        backgroundColor: idx === activeSlide ? colors.primary : colors.border,
+                        width: idx === activeSlide ? 18 : 8,
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+
+              <View style={styles.tutorialActions}>
+                {activeSlide > 0 ? (
+                  <Pressable
+                    onPress={handlePrevSlide}
+                    accessibilityRole="button"
+                    accessibilityLabel="Previous slide"
+                    style={[styles.prevButton, { borderColor: colors.border }]}
+                  >
+                    <Text style={[styles.prevButtonText, { color: colors.text }]}>Back</Text>
+                  </Pressable>
+                ) : (
+                  <View style={styles.prevPlaceholder} />
+                )}
+
+                <Pressable
+                  onPress={handleNextSlide}
+                  accessibilityRole="button"
+                  accessibilityLabel={activeSlide === TUTORIAL_SLIDES.length - 1 ? "Start using TuonTa!" : "Next slide"}
+                  style={[styles.nextButton, { backgroundColor: colors.primary }]}
+                >
+                  <Text style={styles.nextButtonText}>
+                    {activeSlide === TUTORIAL_SLIDES.length - 1 ? "Get Started" : "Next"}
+                  </Text>
+                </Pressable>
+              </View>
             </Animated.View>
-
-            <View style={styles.formBlock}>
-              <FormInput
-                autoCapitalize="words"
-                autoCorrect={false}
-                label="What should we call you?"
-                maxLength={32}
-                onChangeText={(value) => {
-                  setName(value);
-                  if (hasSubmitted) setHasSubmitted(false);
-                }}
-                onSubmitEditing={handleContinue}
-                placeholder="Enter your name"
-                returnKeyType="done"
-                value={name}
-                error={nameError}
-              />
-              <PrimaryButton
-                disabled={!isValid}
-                label={isSaving ? "Preparing your space..." : "Enter TuonTa!"}
-                loading={isSaving}
-                onPress={handleContinue}
-              />
-            </View>
-
-            <Text style={[styles.tagline, { color: colors.primary }]}>Tuon ta, human ta.</Text>
-            <Text style={[styles.footer, { color: colors.muted }]}>Your tasks, your pace, your progress.</Text>
-          </Animated.View>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -188,4 +325,45 @@ const styles = StyleSheet.create({
   formBlock: { marginTop: spacing.lg, width: "100%" },
   tagline: { fontSize: 13, fontWeight: "900", marginTop: spacing.lg },
   footer: { fontSize: 12, marginTop: 5 },
+
+  // Tutorial styles
+  slideCard: {
+    borderRadius: 24,
+    borderWidth: 1,
+    marginTop: spacing.xl,
+    padding: spacing.xl,
+    width: "100%",
+    alignItems: "center",
+    minHeight: 280,
+    justifyContent: "center",
+    shadowColor: "#0B2BAA",
+    shadowOffset: { height: 8, width: 0 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+  slideEmoji: { fontSize: 60, marginBottom: spacing.md },
+  slideTitle: { fontSize: 20, fontWeight: "900", marginBottom: spacing.sm, textAlign: "center" },
+  slideDescription: { fontSize: 14, lineHeight: 22, textAlign: "center" },
+  indicatorRow: { flexDirection: "row", gap: 6, marginVertical: spacing.xl, justifyContent: "center" },
+  indicatorDot: { height: 8, borderRadius: 4 },
+  tutorialActions: { flexDirection: "row", width: "100%", gap: spacing.md },
+  prevButton: {
+    flex: 1,
+    borderRadius: 13,
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 50,
+  },
+  prevButtonText: { fontSize: 15, fontWeight: "800" },
+  prevPlaceholder: { flex: 1 },
+  nextButton: {
+    flex: 1.5,
+    borderRadius: 13,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 50,
+  },
+  nextButtonText: { color: "#FFFFFF", fontSize: 15, fontWeight: "800" },
 });
