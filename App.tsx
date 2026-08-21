@@ -1,5 +1,6 @@
 import { NavigationContainer, DefaultTheme, type Theme } from "@react-navigation/native";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
@@ -61,23 +62,26 @@ function AppShell() {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <SettingsProvider>
-        <TaskProvider>
-          <FocusProvider>
-            <ReminderProvider>
-              <TourProvider>
-                <AppShell />
-              </TourProvider>
-            </ReminderProvider>
-          </FocusProvider>
-        </TaskProvider>
-      </SettingsProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>
+        <SettingsProvider>
+          <TaskProvider>
+            <FocusProvider>
+              <ReminderProvider>
+                <TourProvider>
+                  <AppShell />
+                </TourProvider>
+              </ReminderProvider>
+            </FocusProvider>
+          </TaskProvider>
+        </SettingsProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  root: { flex: 1 },
   loadingSafeArea: { flex: 1 },
   loadingContent: { alignItems: "center", flex: 1, justifyContent: "center", padding: 24 },
   loadingTitle: { fontSize: 17, fontWeight: "800", marginTop: 18, textAlign: "center" },
