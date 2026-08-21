@@ -38,8 +38,8 @@ export const TOUR_STEPS: TourStep[] = [
     title: "Dark Mode Switcher",
     description: "Tap the sun or moon icon in the top header to toggle between light and dark themes.",
     targetTab: "Home",
-    arrowPos: { top: 120, right: 62, type: "up" },
-    tooltipPos: { top: 180, left: "5%", right: "5%" },
+    arrowPos: { top: 105, right: 68, type: "up" },
+    tooltipPos: { top: 120, left: "5%", right: "5%" },
   },
   {
     emoji: "🏠",
@@ -47,8 +47,8 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       "This is your main dashboard. Check your overall task completion progress, review your weekly momentum stats, and view your next upcoming deadlines.",
     targetTab: "Home",
-    arrowPos: { bottom: 85, left: "10.5%", type: "down" },
-    tooltipPos: { bottom: 155, left: "5%", right: "5%" },
+    arrowPos: { bottom: 75, left: "10.5%", type: "down" },
+    tooltipPos: { bottom: 90, left: "5%", right: "5%" },
   },
   {
     emoji: "✅",
@@ -56,8 +56,8 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       "Manage, filter, and search your academic workload. You can search by keywords or tap tag chips to filter the view.",
     targetTab: "Tasks",
-    arrowPos: { bottom: 85, left: "34.5%", type: "down" },
-    tooltipPos: { bottom: 155, left: "5%", right: "5%" },
+    arrowPos: { bottom: 75, left: "34.5%", type: "down" },
+    tooltipPos: { bottom: 90, left: "5%", right: "5%" },
   },
   {
     emoji: "📅",
@@ -65,8 +65,8 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       "Tap the 'Timeline' button at the top-right of the Tasks screen to view all your tasks organized chronologically by due date.",
     targetTab: "Tasks",
-    arrowPos: { top: 110, right: "23%", type: "up" },
-    tooltipPos: { top: 170, left: "5%", right: "5%" },
+    arrowPos: { top: 105, right: "23%", type: "up" },
+    tooltipPos: { top: 120, left: "5%", right: "5%" },
   },
   {
     emoji: "⚡",
@@ -83,8 +83,8 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       "This is your Insights tab. View your consecutive study streak 🔥, see a bar chart of focus minutes, and review your weekly completion rates.",
     targetTab: "Insights",
-    arrowPos: { bottom: 85, left: "59.5%", type: "down" },
-    tooltipPos: { bottom: 155, left: "5%", right: "5%" },
+    arrowPos: { bottom: 75, left: "59.5%", type: "down" },
+    tooltipPos: { bottom: 90, left: "5%", right: "5%" },
   },
   {
     emoji: "👤",
@@ -92,8 +92,8 @@ export const TOUR_STEPS: TourStep[] = [
     description:
       "Customize your student profile, configure deadline push notifications, and look at the timeline of all upcoming scheduled reminders.",
     targetTab: "Profile",
-    arrowPos: { bottom: 85, left: "84.5%", type: "down" },
-    tooltipPos: { bottom: 155, left: "5%", right: "5%" },
+    arrowPos: { bottom: 75, left: "84.5%", type: "down" },
+    tooltipPos: { bottom: 90, left: "5%", right: "5%" },
   },
 ];
 

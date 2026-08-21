@@ -5,6 +5,122 @@ import { useSettings } from "@/context/SettingsContext";
 import { TOUR_STEPS, useTour } from "@/context/TourContext";
 import { spacing } from "@/theme/colors";
 
+function SwipeDemo() {
+  const { colors } = useSettings();
+  const swipeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.delay(500),
+        // Swipe right (complete)
+        Animated.timing(swipeAnim, { toValue: 80, duration: 1000, useNativeDriver: true }),
+        Animated.delay(1000),
+        // Swipe back
+        Animated.timing(swipeAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
+        Animated.delay(500),
+        // Swipe left (delete)
+        Animated.timing(swipeAnim, { toValue: -80, duration: 1000, useNativeDriver: true }),
+        Animated.delay(1000),
+        // Swipe back
+        Animated.timing(swipeAnim, { toValue: 0, duration: 500, useNativeDriver: true }),
+      ])
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [swipeAnim]);
+
+  const bgCompleteOpacity = swipeAnim.interpolate({
+    inputRange: [0, 80],
+    outputRange: [0, 1],
+    extrapolate: "clamp",
+  });
+
+  const bgDeleteOpacity = swipeAnim.interpolate({
+    inputRange: [-80, 0],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
+  return (
+    <View style={[styles.demoContainer, { borderColor: colors.border }]}>
+      {/* Background action complete */}
+      <Animated.View
+        style={[
+          styles.demoBg,
+          styles.demoBgComplete,
+          { backgroundColor: colors.successSoft, opacity: bgCompleteOpacity },
+        ]}
+      >
+        <Text style={[styles.demoBgText, { color: colors.success }]}>✓ Complete</Text>
+      </Animated.View>
+
+      {/* Background action delete */}
+      <Animated.View
+        style={[styles.demoBg, styles.demoBgDelete, { backgroundColor: colors.dangerSoft, opacity: bgDeleteOpacity }]}
+      >
+        <Text style={[styles.demoBgText, { color: colors.danger }]}>Delete ✕</Text>
+      </Animated.View>
+
+      {/* Sliding card */}
+      <Animated.View
+        style={[
+          styles.demoCard,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            transform: [{ translateX: swipeAnim }],
+          },
+        ]}
+      >
+        <View style={styles.demoHeader}>
+          <Text style={[styles.demoTitle, { color: colors.text }]} numberOfLines={1}>
+            Demo Assignment Task
+          </Text>
+          <Text
+            style={[
+              styles.demoTag,
+              { backgroundColor: colors.dangerSoft, color: colors.danger, borderColor: colors.danger },
+            ]}
+          >
+            HIGH
+          </Text>
+        </View>
+        <Text style={[styles.demoSubtitle, { color: colors.muted }]}>Swipe right to complete, left to delete.</Text>
+      </Animated.View>
+
+      {/* Animated finger pointer indicator */}
+      <Animated.Text
+        style={[
+          styles.demoFinger,
+          {
+            transform: [
+              {
+                translateX: swipeAnim.interpolate({
+                  inputRange: [-80, 0, 80],
+                  outputRange: [-40, 20, 80],
+                }),
+              },
+              {
+                translateY: swipeAnim.interpolate({
+                  inputRange: [-80, 0, 80],
+                  outputRange: [25, 20, 25],
+                }),
+              },
+            ],
+            opacity: swipeAnim.interpolate({
+              inputRange: [-80, -40, 0, 40, 80],
+              outputRange: [0, 1, 1, 1, 0],
+            }),
+          },
+        ]}
+      >
+        👆
+      </Animated.Text>
+    </View>
+  );
+}
+
 export function TourOverlay() {
   const { colors } = useSettings();
   const { tourActive, currentStep, nextStep, prevStep, skipTour } = useTour();
@@ -91,6 +207,9 @@ export function TourOverlay() {
             </View>
           </View>
           <Text style={[styles.description, { color: colors.muted }]}>{stepData.description}</Text>
+
+          {/* Render Swipe animation demo during step index 5 */}
+          {currentStep === 5 && <SwipeDemo />}
 
           <View style={styles.actions}>
             <Pressable
@@ -269,5 +388,73 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 13,
     fontWeight: "800",
+  },
+
+  // Swipe Demo styles
+  demoContainer: {
+    height: 72,
+    width: "100%",
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: "hidden",
+    position: "relative",
+    marginVertical: spacing.md,
+  },
+  demoBg: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: "center",
+    paddingHorizontal: spacing.md,
+  },
+  demoBgComplete: {
+    alignItems: "flex-start",
+  },
+  demoBgDelete: {
+    alignItems: "flex-end",
+  },
+  demoBgText: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  demoCard: {
+    height: "100%",
+    width: "100%",
+    borderRadius: 10,
+    borderWidth: 1,
+    justifyContent: "center",
+    paddingHorizontal: spacing.md,
+    zIndex: 2,
+  },
+  demoHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  demoTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    maxWidth: "80%",
+  },
+  demoTag: {
+    fontSize: 9,
+    fontWeight: "800",
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 5,
+    overflow: "hidden",
+    borderWidth: 1,
+  },
+  demoSubtitle: {
+    fontSize: 11,
+    marginTop: 4,
+  },
+  demoFinger: {
+    fontSize: 24,
+    position: "absolute",
+    bottom: 4,
+    zIndex: 999,
   },
 });
