@@ -1,15 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Animated,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-} from "react-native";
+import { Animated, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FormInput } from "@/components/FormInput";
@@ -27,33 +17,40 @@ function validateName(value: string) {
 interface TutorialSlide {
   emoji: string;
   title: string;
+  subtitle: string;
   description: string;
 }
 
 const TUTORIAL_SLIDES: TutorialSlide[] = [
   {
-    emoji: "📝",
-    title: "Organize Your Tasks",
-    description:
-      "Add your assignments, quizzes, and exams. Assign subjects, priority levels, recurrence patterns, and custom reminders so you never miss a deadline.",
+    emoji: "🏠",
+    title: "Home Screen (Home Tab)",
+    subtitle: "Your Daily Control Panel",
+    description: "Displays your total tasks, completion percentage, and weekly stats. Tap the sun/moon button at the top-right to toggle Dark Mode. Tap the '+' button at the bottom to quickly plan a task, or tap any upcoming task to open its details.",
+  },
+  {
+    emoji: "📋",
+    title: "Task Organizer (Tasks Tab)",
+    subtitle: "View & Filter Your Workload",
+    description: "Manage your academic requirements. Tap 'Timeline' at the top-right to see tasks grouped by due date. Tap '+ Add' to create new tasks. You can also search, filter by tag, or cycle the sort order. Swipe RIGHT on any task card to mark it complete, or swipe LEFT to delete.",
   },
   {
     emoji: "⏱️",
-    title: "Focused Study Sessions",
-    description:
-      "Tackle tasks using custom single-session focus timers (up to 180 min) or use the Pomodoro mode (25-min work blocks + break periods) to build study habits.",
+    title: "Study Focus (Focus Timer)",
+    subtitle: "Boost Concentration & Pomodoro",
+    description: "Click 'Start focus session' inside any task's details. Pick a preset block, use the '+' or '−' buttons to set a custom duration (up to 180 min), or toggle 'Pomodoro' mode for structured 25-minute work rounds and breaks.",
   },
   {
-    emoji: "🔥",
-    title: "Insights & Momentum",
-    description:
-      "View your study streak, monitor your weekly progress, and analyze focus breakdowns by subject to stay motivated.",
+    emoji: "📊",
+    title: "Analytics (Insights Tab)",
+    subtitle: "Your Momentum & Progress Tracker",
+    description: "Examine your habits. View your consecutive daily completion streak (with a fire 🔥 icon), inspect your daily study duration chart over the last 7 days, and look at the focus breakdown to see which subjects consume the most study time.",
   },
   {
-    emoji: "⚡",
-    title: "Quick Swipe Actions",
-    description:
-      "Manage tasks instantly from your task list. Swipe right to mark a task as completed, or swipe left to delete it.",
+    emoji: "👤",
+    title: "Profile & Settings (Profile Tab)",
+    subtitle: "Personalize & Control Reminders",
+    description: "Tap 'Edit profile' to update your name, course, year, and student ID. Toggle push notification reminders and see a list of scheduled deadline reminders. Scroll to the bottom to find the reset button if you want to wipe sample data.",
   },
 ];
 
@@ -214,8 +211,8 @@ export function WelcomeScreen() {
                 <Text style={[styles.brandName, { color: colors.primary }]}>TuonTa!</Text>
               </View>
 
-              <Text style={[styles.eyebrow, { color: colors.primary, marginTop: spacing.md }]}>QUICK TUTORIAL</Text>
-              <Text style={[styles.title, { color: colors.text }]}>How to use the app</Text>
+              <Text style={[styles.eyebrow, { color: colors.primary, marginTop: spacing.md }]}>NAVIGATION GUIDE</Text>
+              <Text style={[styles.title, { color: colors.text }]}>Explore Your Workspace</Text>
 
               <Animated.View
                 style={[
@@ -224,7 +221,12 @@ export function WelcomeScreen() {
                 ]}
               >
                 <Text style={styles.slideEmoji}>{TUTORIAL_SLIDES[activeSlide].emoji}</Text>
-                <Text style={[styles.slideTitle, { color: colors.text }]}>{TUTORIAL_SLIDES[activeSlide].title}</Text>
+                <Text style={[styles.slideTitle, { color: colors.text }]}>
+                  {TUTORIAL_SLIDES[activeSlide].title}
+                </Text>
+                <Text style={[styles.slideSubtitle, { color: colors.primary }]}>
+                  {TUTORIAL_SLIDES[activeSlide].subtitle}
+                </Text>
                 <Text style={[styles.slideDescription, { color: colors.muted }]}>
                   {TUTORIAL_SLIDES[activeSlide].description}
                 </Text>
@@ -334,7 +336,7 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     width: "100%",
     alignItems: "center",
-    minHeight: 280,
+    minHeight: 330,
     justifyContent: "center",
     shadowColor: "#0B2BAA",
     shadowOffset: { height: 8, width: 0 },
@@ -342,8 +344,9 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 3,
   },
-  slideEmoji: { fontSize: 60, marginBottom: spacing.md },
-  slideTitle: { fontSize: 20, fontWeight: "900", marginBottom: spacing.sm, textAlign: "center" },
+  slideEmoji: { fontSize: 60, marginBottom: spacing.sm },
+  slideTitle: { fontSize: 20, fontWeight: "900", textAlign: "center" },
+  slideSubtitle: { fontSize: 13, fontWeight: "800", marginTop: 4, marginBottom: spacing.md, textTransform: "uppercase", letterSpacing: 1.2 },
   slideDescription: { fontSize: 14, lineHeight: 22, textAlign: "center" },
   indicatorRow: { flexDirection: "row", gap: 6, marginVertical: spacing.xl, justifyContent: "center" },
   indicatorDot: { height: 8, borderRadius: 4 },
