@@ -1,15 +1,22 @@
-import { useMemo } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useRef } from "react";
+import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 
+import { SkeletonStatCard } from "@/components/SkeletonLoader";
 import { StatCard } from "@/components/StatCard";
 import { useFocus } from "@/context/FocusContext";
 import { useSettings } from "@/context/SettingsContext";
 import { useTasks } from "@/context/TaskContext";
 import { spacing } from "@/theme/colors";
 import type { RootTabParamList } from "@/navigation/navigationTypes";
-import { formatDuration, weeklyCompletedTaskCount, weeklyFocusMinutes, weeklyFocusSessionCount, weeklyTaskCount } from "@/utils/productivity";
+import {
+  formatDuration,
+  weeklyCompletedTaskCount,
+  weeklyFocusMinutes,
+  weeklyFocusSessionCount,
+  weeklyTaskCount,
+} from "@/utils/productivity";
 import { formatDate, getDueDateStatus } from "@/utils/validation";
 
 export type HomeScreenProps = BottomTabScreenProps<RootTabParamList, "Home">;
@@ -18,14 +25,319 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   const { colors, settings, toggleDarkMode } = useSettings();
   const { tasks, loading } = useTasks();
   const { sessions } = useFocus();
-  const stats = useMemo(() => ({ total: tasks.length, completed: tasks.filter((task) => task.status === "Completed").length, pending: tasks.filter((task) => task.status === "Pending").length, high: tasks.filter((task) => task.priority === "High" && task.status === "Pending").length }), [tasks]);
+  const stats = useMemo(
+    () => ({
+      total: tasks.length,
+      completed: tasks.filter((task) => task.status === "Completed").length,
+      pending: tasks.filter((task) => task.status === "Pending").length,
+      high: tasks.filter((task) => task.priority === "High" && task.status === "Pending").length,
+    }),
+    [tasks]
+  );
   const completionPercent = stats.total ? Math.round((stats.completed / stats.total) * 100) : 0;
-  const upcoming = tasks.filter((task) => task.status === "Pending").slice().sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 3);
-  const weeklyStats = useMemo(() => ({ due: weeklyTaskCount(tasks), completed: weeklyCompletedTaskCount(tasks), focusMinutes: weeklyFocusMinutes(sessions), focusSessions: weeklyFocusSessionCount(sessions) }), [sessions, tasks]);
+  const upcoming = tasks
+    .filter((task) => task.status === "Pending")
+    .slice()
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    .slice(0, 3);
+  const weeklyStats = useMemo(
+    () => ({
+      due: weeklyTaskCount(tasks),
+      completed: weeklyCompletedTaskCount(tasks),
+      focusMinutes: weeklyFocusMinutes(sessions),
+      focusSessions: weeklyFocusSessionCount(sessions),
+    }),
+    [sessions, tasks]
+  );
 
-  return <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}><ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}><View style={styles.topRow}><View style={styles.topCopy}><Text style={[styles.eyebrow, { color: colors.primary }]}>TuonTa!</Text><Text style={[styles.greeting, { color: colors.text }]}>Good morning, {settings.name.split(" ")[0]}.</Text><Text style={[styles.subtitle, { color: colors.muted }]}>Tuon ta, human ta. Let’s make progress.</Text></View><View style={styles.topActions}><Pressable accessibilityRole="button" accessibilityLabel={settings.darkMode ? "Switch to light mode" : "Switch to dark mode"} accessibilityHint="Changes the app color theme" onPress={toggleDarkMode} style={({ pressed }) => [styles.themeButton, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && styles.pressed]}><Text style={[styles.themeIcon, { color: colors.primary }]}>{settings.darkMode ? "☀" : "☾"}</Text></Pressable><Image source={require("../../assets/branding/tuonta-icon.png")} style={[styles.avatar, { backgroundColor: colors.accent }]} resizeMode="contain" accessibilityLabel="TuonTa! icon" /></View></View>{loading ? <View style={[styles.loadingBox, { backgroundColor: colors.surface }]}><Text style={[styles.loadingText, { color: colors.muted }]}>Restoring your tasks...</Text></View> : <><View style={styles.sectionHeader}><Text style={[styles.sectionTitle, { color: colors.text }]}>Your tasks</Text><Text style={[styles.sectionHint, { color: colors.muted }]}>{stats.pending} pending</Text></View><View style={styles.statsGrid}><StatCard label="Total tasks" value={stats.total} tone="primary" /><StatCard label="Completed" value={stats.completed} tone="success" /><StatCard label="Pending" value={stats.pending} tone="warning" /><StatCard label="High priority" value={stats.high} tone="danger" /></View><View style={[styles.progressCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={styles.progressHeader}><Text style={[styles.progressTitle, { color: colors.text }]}>Completion progress</Text><Text style={[styles.progressValue, { color: colors.primary }]}>{completionPercent}%</Text></View><View style={[styles.progressTrack, { backgroundColor: colors.accent }]}><View style={[styles.progressFill, { backgroundColor: colors.primary, width: `${completionPercent}%` }]} /></View><Text style={[styles.progressHint, { color: colors.muted }]}>{stats.completed} of {stats.total} tasks completed</Text></View><View style={[styles.weeklyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={styles.weeklyHeader}><View><Text style={[styles.weeklyTitle, { color: colors.text }]}>Weekly momentum</Text><Text style={[styles.weeklySub, { color: colors.muted }]}>Your progress at a glance.</Text></View><Text style={[styles.weeklyBadge, { color: colors.primary, backgroundColor: colors.accent }]}>THIS WEEK</Text></View><View style={styles.weeklyMetrics}><View style={styles.weeklyMetric}><Text style={[styles.weeklyMetricValue, { color: colors.primary }]}>{weeklyStats.completed}/{weeklyStats.due}</Text><Text style={[styles.weeklyMetricLabel, { color: colors.muted }]}>tasks done</Text></View><View style={[styles.weeklyDivider, { backgroundColor: colors.border }]} /><View style={styles.weeklyMetric}><Text style={[styles.weeklyMetricValue, { color: colors.success }]}>{formatDuration(weeklyStats.focusMinutes)}</Text><Text style={[styles.weeklyMetricLabel, { color: colors.muted }]}>focus time</Text></View><View style={[styles.weeklyDivider, { backgroundColor: colors.border }]} /><View style={styles.weeklyMetric}><Text style={[styles.weeklyMetricValue, { color: colors.warning }]}>{weeklyStats.focusSessions}</Text><Text style={[styles.weeklyMetricLabel, { color: colors.muted }]}>sessions</Text></View></View></View><View style={styles.sectionHeader}><Text style={[styles.sectionTitle, { color: colors.text }]}>Upcoming tasks</Text><Pressable onPress={() => navigation.navigate("Tasks", { screen: "TaskList" })}><Text style={[styles.link, { color: colors.primary }]}>View all</Text></Pressable></View>{upcoming.length === 0 ? <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}><Text style={[styles.emptyTitle, { color: colors.text }]}>You are all caught up.</Text><Text style={[styles.emptyText, { color: colors.muted }]}>Add a task to plan your next study session.</Text></View> : upcoming.map((task) => { const dueStatus = getDueDateStatus(task); const urgencyColor = dueStatus === "Overdue" ? colors.danger : dueStatus === "Due soon" || dueStatus === "Due today" ? colors.warning : colors.success; return <Pressable key={task.id} onPress={() => navigation.navigate("Tasks", { screen: "TaskDetails", params: { taskId: task.id } })} style={({ pressed }) => [styles.upcomingCard, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && styles.pressed]}><View style={[styles.taskDot, { backgroundColor: urgencyColor }]} /><View style={styles.taskText}><Text style={[styles.taskTitle, { color: colors.text }]} numberOfLines={1}>{task.title}</Text><Text style={[styles.taskSubject, { color: colors.muted }]}>{task.subject}</Text></View><View style={styles.dateWrap}><Text style={[styles.taskDate, { color: urgencyColor }]}>{formatDate(task.dueDate)}</Text><Text style={[styles.urgency, { color: urgencyColor }]}>{dueStatus}</Text></View></Pressable>; })}<Pressable onPress={() => navigation.navigate("Tasks", { screen: "AddTask" })} style={({ pressed }) => [styles.addCard, { backgroundColor: colors.primary }, pressed && styles.pressed]}><View style={styles.addIcon}><Text style={styles.addIconText}>+</Text></View><View><Text style={styles.addTitle}>Plan a new task</Text><Text style={styles.addSubtitle}>Capture your next academic deadline.</Text></View></Pressable></>}</ScrollView></SafeAreaView>;
+  // Animated progress bar
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: completionPercent,
+      duration: 800,
+      useNativeDriver: false,
+    }).start();
+  }, [completionPercent, progressAnim]);
+
+  const progressWidth = progressAnim.interpolate({
+    inputRange: [0, 100],
+    outputRange: ["0%", "100%"],
+    extrapolate: "clamp",
+  });
+
+  return (
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.topRow}>
+          <View style={styles.topCopy}>
+            <Text style={[styles.eyebrow, { color: colors.primary }]}>TuonTa!</Text>
+            <Text style={[styles.greeting, { color: colors.text }]}>Good morning, {settings.name.split(" ")[0]}.</Text>
+            <Text style={[styles.subtitle, { color: colors.muted }]}>Tuon ta, human ta. Let's make progress.</Text>
+          </View>
+          <View style={styles.topActions}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={settings.darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              accessibilityHint="Changes the app color theme"
+              onPress={toggleDarkMode}
+              style={({ pressed }) => [
+                styles.themeButton,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={[styles.themeIcon, { color: colors.primary }]}>{settings.darkMode ? "☀" : "☾"}</Text>
+            </Pressable>
+            <Image
+              source={require("../../assets/branding/tuonta-icon.png")}
+              style={[styles.avatar, { backgroundColor: colors.accent }]}
+              resizeMode="contain"
+              accessibilityLabel="TuonTa! icon"
+            />
+          </View>
+        </View>
+
+        {loading ? (
+          /* Skeleton loading state */
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Your tasks</Text>
+            </View>
+            <View style={styles.statsGrid}>
+              <SkeletonStatCard />
+              <SkeletonStatCard />
+              <SkeletonStatCard />
+              <SkeletonStatCard />
+            </View>
+          </>
+        ) : (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Your tasks</Text>
+              <Text style={[styles.sectionHint, { color: colors.muted }]}>{stats.pending} pending</Text>
+            </View>
+
+            <View style={styles.statsGrid}>
+              <StatCard label="Total tasks" value={stats.total} tone="primary" />
+              <StatCard label="Completed" value={stats.completed} tone="success" />
+              <StatCard label="Pending" value={stats.pending} tone="warning" />
+              <StatCard label="High priority" value={stats.high} tone="danger" />
+            </View>
+
+            {/* Animated progress bar */}
+            <View style={[styles.progressCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={styles.progressHeader}>
+                <Text style={[styles.progressTitle, { color: colors.text }]}>Completion progress</Text>
+                <Text style={[styles.progressValue, { color: colors.primary }]}>{completionPercent}%</Text>
+              </View>
+              <View style={[styles.progressTrack, { backgroundColor: colors.accent }]}>
+                <Animated.View
+                  style={[styles.progressFill, { backgroundColor: colors.primary, width: progressWidth }]}
+                />
+              </View>
+              <Text style={[styles.progressHint, { color: colors.muted }]}>
+                {stats.completed} of {stats.total} tasks completed
+              </Text>
+            </View>
+
+            {/* Weekly momentum */}
+            <View style={[styles.weeklyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <View style={styles.weeklyHeader}>
+                <View>
+                  <Text style={[styles.weeklyTitle, { color: colors.text }]}>Weekly momentum</Text>
+                  <Text style={[styles.weeklySub, { color: colors.muted }]}>Your progress at a glance.</Text>
+                </View>
+                <Text style={[styles.weeklyBadge, { color: colors.primary, backgroundColor: colors.accent }]}>
+                  THIS WEEK
+                </Text>
+              </View>
+              <View style={styles.weeklyMetrics}>
+                <View style={styles.weeklyMetric}>
+                  <Text style={[styles.weeklyMetricValue, { color: colors.primary }]}>
+                    {weeklyStats.completed}/{weeklyStats.due}
+                  </Text>
+                  <Text style={[styles.weeklyMetricLabel, { color: colors.muted }]}>tasks done</Text>
+                </View>
+                <View style={[styles.weeklyDivider, { backgroundColor: colors.border }]} />
+                <View style={styles.weeklyMetric}>
+                  <Text style={[styles.weeklyMetricValue, { color: colors.success }]}>
+                    {formatDuration(weeklyStats.focusMinutes)}
+                  </Text>
+                  <Text style={[styles.weeklyMetricLabel, { color: colors.muted }]}>focus time</Text>
+                </View>
+                <View style={[styles.weeklyDivider, { backgroundColor: colors.border }]} />
+                <View style={styles.weeklyMetric}>
+                  <Text style={[styles.weeklyMetricValue, { color: colors.warning }]}>{weeklyStats.focusSessions}</Text>
+                  <Text style={[styles.weeklyMetricLabel, { color: colors.muted }]}>sessions</Text>
+                </View>
+              </View>
+            </View>
+
+            {/* Upcoming tasks */}
+            <View style={styles.sectionHeader}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Upcoming tasks</Text>
+              <Pressable
+                onPress={() => navigation.navigate("Tasks", { screen: "TaskList" })}
+                accessibilityRole="link"
+                accessibilityLabel="View all tasks"
+              >
+                <Text style={[styles.link, { color: colors.primary }]}>View all</Text>
+              </Pressable>
+            </View>
+
+            {upcoming.length === 0 ? (
+              <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>You are all caught up.</Text>
+                <Text style={[styles.emptyText, { color: colors.muted }]}>
+                  Add a task to plan your next study session.
+                </Text>
+              </View>
+            ) : (
+              upcoming.map((task) => {
+                const dueStatus = getDueDateStatus(task);
+                const urgencyColor =
+                  dueStatus === "Overdue"
+                    ? colors.danger
+                    : dueStatus === "Due soon" || dueStatus === "Due today"
+                      ? colors.warning
+                      : colors.success;
+                return (
+                  <Pressable
+                    key={task.id}
+                    onPress={() => navigation.navigate("Tasks", { screen: "TaskDetails", params: { taskId: task.id } })}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${task.title}, ${task.subject}, ${dueStatus}`}
+                    accessibilityHint="Opens task details"
+                    style={({ pressed }) => [
+                      styles.upcomingCard,
+                      { backgroundColor: colors.surface, borderColor: colors.border },
+                      pressed && styles.pressed,
+                    ]}
+                  >
+                    <View style={[styles.taskDot, { backgroundColor: urgencyColor }]} />
+                    <View style={styles.taskText}>
+                      <Text style={[styles.taskTitle, { color: colors.text }]} numberOfLines={1}>
+                        {task.title}
+                      </Text>
+                      <Text style={[styles.taskSubject, { color: colors.muted }]}>{task.subject}</Text>
+                    </View>
+                    <View style={styles.dateWrap}>
+                      <Text style={[styles.taskDate, { color: urgencyColor }]}>{formatDate(task.dueDate)}</Text>
+                      <Text style={[styles.urgency, { color: urgencyColor }]}>{dueStatus}</Text>
+                    </View>
+                  </Pressable>
+                );
+              })
+            )}
+
+            <Pressable
+              onPress={() => navigation.navigate("Tasks", { screen: "AddTask" })}
+              accessibilityRole="button"
+              accessibilityLabel="Plan a new task"
+              accessibilityHint="Opens the task creation form"
+              style={({ pressed }) => [styles.addCard, { backgroundColor: colors.primary }, pressed && styles.pressed]}
+            >
+              <View style={styles.addIcon}>
+                <Text style={styles.addIconText}>+</Text>
+              </View>
+              <View>
+                <Text style={styles.addTitle}>Plan a new task</Text>
+                <Text style={styles.addSubtitle}>Capture your next academic deadline.</Text>
+              </View>
+            </Pressable>
+          </>
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 }, content: { padding: spacing.md, paddingBottom: spacing.xl }, topRow: { alignItems: "flex-start", flexDirection: "row", justifyContent: "space-between", marginBottom: spacing.xl }, topCopy: { flex: 1, minWidth: 0 }, topActions: { alignItems: "center", flexDirection: "row", gap: spacing.xs, marginLeft: spacing.sm }, themeButton: { alignItems: "center", borderRadius: 19, borderWidth: 1, height: 38, justifyContent: "center", width: 38 }, themeIcon: { fontSize: 21, fontWeight: "800" }, eyebrow: { fontSize: 12, fontWeight: "900", letterSpacing: 2, marginBottom: 7 }, greeting: { fontSize: 23, fontWeight: "800" }, subtitle: { fontSize: 13, marginTop: 6 }, avatar: { borderRadius: 24, height: 50, padding: 7, width: 50 }, loadingBox: { alignItems: "center", borderRadius: 18, padding: spacing.xl }, loadingText: { fontSize: 14 }, sectionHeader: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: spacing.sm, marginTop: spacing.md }, sectionTitle: { fontSize: 18, fontWeight: "800" }, sectionHint: { fontSize: 12, fontWeight: "700" }, link: { fontSize: 13, fontWeight: "800" }, statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }, progressCard: { borderRadius: 16, borderWidth: 1, marginTop: spacing.sm, padding: spacing.md }, weeklyCard: { borderRadius: 18, borderWidth: 1, marginTop: spacing.md, padding: spacing.md }, weeklyHeader: { alignItems: "flex-start", flexDirection: "row", justifyContent: "space-between" }, weeklyTitle: { fontSize: 16, fontWeight: "900" }, weeklySub: { fontSize: 12, marginTop: 3 }, weeklyBadge: { borderRadius: 8, fontSize: 9, fontWeight: "900", overflow: "hidden", paddingHorizontal: 7, paddingVertical: 5 }, weeklyMetrics: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: spacing.md }, weeklyMetric: { alignItems: "center", flex: 1 }, weeklyMetricValue: { fontSize: 16, fontWeight: "900" }, weeklyMetricLabel: { fontSize: 10, marginTop: 4 }, weeklyDivider: { height: 30, width: 1 }, progressHeader: { flexDirection: "row", justifyContent: "space-between" }, progressTitle: { fontSize: 14, fontWeight: "800" }, progressValue: { fontSize: 14, fontWeight: "900" }, progressTrack: { borderRadius: 5, height: 9, marginTop: spacing.sm, overflow: "hidden" }, progressFill: { borderRadius: 5, height: 9 }, progressHint: { fontSize: 12, marginTop: 8 }, emptyCard: { borderRadius: 16, borderWidth: 1, padding: spacing.lg }, emptyTitle: { fontSize: 15, fontWeight: "800" }, emptyText: { fontSize: 13, marginTop: 5 }, upcomingCard: { alignItems: "center", borderRadius: 15, borderWidth: 1, flexDirection: "row", marginBottom: spacing.sm, padding: spacing.md }, pressed: { opacity: 0.72 }, taskDot: { borderRadius: 6, height: 10, marginRight: spacing.sm, width: 10 }, taskText: { flex: 1 }, taskTitle: { fontSize: 14, fontWeight: "800" }, taskSubject: { fontSize: 12, marginTop: 3 }, dateWrap: { alignItems: "flex-end", marginLeft: spacing.sm }, taskDate: { fontSize: 11, fontWeight: "800" }, urgency: { fontSize: 10, fontWeight: "700", marginTop: 3 }, addCard: { alignItems: "center", borderRadius: 17, flexDirection: "row", marginTop: spacing.md, padding: spacing.md }, addIcon: { alignItems: "center", backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 17, height: 34, justifyContent: "center", marginRight: spacing.sm, width: 34 }, addIconText: { color: "#FFFFFF", fontSize: 24, fontWeight: "300", lineHeight: 27 }, addTitle: { color: "#FFFFFF", fontSize: 15, fontWeight: "800" }, addSubtitle: { color: "#DDE5FF", fontSize: 12, marginTop: 3 },
+  safeArea: { flex: 1 },
+  content: { padding: spacing.md, paddingBottom: spacing.xl },
+  topRow: { alignItems: "flex-start", flexDirection: "row", justifyContent: "space-between", marginBottom: spacing.xl },
+  topCopy: { flex: 1, minWidth: 0 },
+  topActions: { alignItems: "center", flexDirection: "row", gap: spacing.xs, marginLeft: spacing.sm },
+  themeButton: {
+    alignItems: "center",
+    borderRadius: 19,
+    borderWidth: 1,
+    height: 38,
+    justifyContent: "center",
+    width: 38,
+  },
+  themeIcon: { fontSize: 21, fontWeight: "800" },
+  eyebrow: { fontSize: 12, fontWeight: "900", letterSpacing: 2, marginBottom: 7 },
+  greeting: { fontSize: 23, fontWeight: "800" },
+  subtitle: { fontSize: 13, marginTop: 6 },
+  avatar: { borderRadius: 24, height: 50, padding: 7, width: 50 },
+  sectionHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: spacing.sm,
+    marginTop: spacing.md,
+  },
+  sectionTitle: { fontSize: 18, fontWeight: "800" },
+  sectionHint: { fontSize: 12, fontWeight: "700" },
+  link: { fontSize: 13, fontWeight: "800" },
+  statsGrid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  progressCard: { borderRadius: 16, borderWidth: 1, marginTop: spacing.sm, padding: spacing.md },
+  weeklyCard: { borderRadius: 18, borderWidth: 1, marginTop: spacing.md, padding: spacing.md },
+  weeklyHeader: { alignItems: "flex-start", flexDirection: "row", justifyContent: "space-between" },
+  weeklyTitle: { fontSize: 16, fontWeight: "900" },
+  weeklySub: { fontSize: 12, marginTop: 3 },
+  weeklyBadge: {
+    borderRadius: 8,
+    fontSize: 9,
+    fontWeight: "900",
+    overflow: "hidden",
+    paddingHorizontal: 7,
+    paddingVertical: 5,
+  },
+  weeklyMetrics: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginTop: spacing.md },
+  weeklyMetric: { alignItems: "center", flex: 1 },
+  weeklyMetricValue: { fontSize: 16, fontWeight: "900" },
+  weeklyMetricLabel: { fontSize: 10, marginTop: 4 },
+  weeklyDivider: { height: 30, width: 1 },
+  progressHeader: { flexDirection: "row", justifyContent: "space-between" },
+  progressTitle: { fontSize: 14, fontWeight: "800" },
+  progressValue: { fontSize: 14, fontWeight: "900" },
+  progressTrack: { borderRadius: 5, height: 9, marginTop: spacing.sm, overflow: "hidden" },
+  progressFill: { borderRadius: 5, height: 9 },
+  progressHint: { fontSize: 12, marginTop: 8 },
+  emptyCard: { borderRadius: 16, borderWidth: 1, padding: spacing.lg },
+  emptyTitle: { fontSize: 15, fontWeight: "800" },
+  emptyText: { fontSize: 13, marginTop: 5 },
+  upcomingCard: {
+    alignItems: "center",
+    borderRadius: 15,
+    borderWidth: 1,
+    flexDirection: "row",
+    marginBottom: spacing.sm,
+    padding: spacing.md,
+  },
+  pressed: { opacity: 0.72 },
+  taskDot: { borderRadius: 6, height: 10, marginRight: spacing.sm, width: 10 },
+  taskText: { flex: 1 },
+  taskTitle: { fontSize: 14, fontWeight: "800" },
+  taskSubject: { fontSize: 12, marginTop: 3 },
+  dateWrap: { alignItems: "flex-end", marginLeft: spacing.sm },
+  taskDate: { fontSize: 11, fontWeight: "800" },
+  urgency: { fontSize: 10, fontWeight: "700", marginTop: 3 },
+  addCard: { alignItems: "center", borderRadius: 17, flexDirection: "row", marginTop: spacing.md, padding: spacing.md },
+  addIcon: {
+    alignItems: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 17,
+    height: 34,
+    justifyContent: "center",
+    marginRight: spacing.sm,
+    width: 34,
+  },
+  addIconText: { color: "#FFFFFF", fontSize: 24, fontWeight: "300", lineHeight: 27 },
+  addTitle: { color: "#FFFFFF", fontSize: 15, fontWeight: "800" },
+  addSubtitle: { color: "#DDE5FF", fontSize: 12, marginTop: 3 },
 });

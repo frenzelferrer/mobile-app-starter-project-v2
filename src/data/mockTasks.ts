@@ -10,7 +10,10 @@ const taskJson = `[
     "description": "Complete the React Native midterm mobile application and prepare a short demonstration.",
     "dueDate": "2026-08-25",
     "priority": "High",
-    "status": "Pending"
+    "status": "Pending",
+    "tags": ["project", "exam"],
+    "recurrence": "none",
+    "reminderAdvance": "1d"
   },
   {
     "id": "task-2",
@@ -19,7 +22,10 @@ const taskJson = `[
     "description": "Solve the normalization exercises and explain the final table relationships.",
     "dueDate": "2026-08-27",
     "priority": "Medium",
-    "status": "Pending"
+    "status": "Pending",
+    "tags": ["homework"],
+    "recurrence": "none",
+    "reminderAdvance": "1d"
   },
   {
     "id": "task-3",
@@ -28,7 +34,10 @@ const taskJson = `[
     "description": "Review the portfolio layout on mobile and desktop widths and submit improvement notes.",
     "dueDate": "2026-08-22",
     "priority": "Low",
-    "status": "Completed"
+    "status": "Completed",
+    "tags": ["review"],
+    "recurrence": "none",
+    "reminderAdvance": "1d"
   },
   {
     "id": "task-4",
@@ -37,7 +46,10 @@ const taskJson = `[
     "description": "Study IPv4 subnetting examples and complete the practice quiz before the lab session.",
     "dueDate": "2026-08-29",
     "priority": "High",
-    "status": "Pending"
+    "status": "Pending",
+    "tags": ["quiz", "exam"],
+    "recurrence": "weekly",
+    "reminderAdvance": "3d"
   },
   {
     "id": "task-5",
@@ -46,7 +58,10 @@ const taskJson = `[
     "description": "Summarize the case study and prepare three discussion questions for class.",
     "dueDate": "2026-09-02",
     "priority": "Medium",
-    "status": "Completed"
+    "status": "Completed",
+    "tags": ["reading"],
+    "recurrence": "none",
+    "reminderAdvance": "1d"
   }
 ]`;
 

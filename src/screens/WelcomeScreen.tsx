@@ -39,7 +39,7 @@ export function WelcomeScreen() {
       Animated.sequence([
         Animated.timing(float, { toValue: -7, duration: 1500, useNativeDriver: true }),
         Animated.timing(float, { toValue: 0, duration: 1500, useNativeDriver: true }),
-      ]),
+      ])
     );
     floatingAnimation.start();
     return () => floatingAnimation.stop();
@@ -62,7 +62,11 @@ export function WelcomeScreen() {
   return (
     <SafeAreaView edges={["top", "bottom"]} style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.keyboard}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <Animated.View style={[styles.container, { opacity: fade, transform: [{ scale }] }]}>
             <View style={styles.brandRow}>
               <View style={[styles.brandMark, { backgroundColor: colors.accent }]}>
@@ -75,7 +79,12 @@ export function WelcomeScreen() {
               <View style={[styles.orbit, styles.orbitOne, { borderColor: colors.accent }]} />
               <View style={[styles.orbit, styles.orbitTwo, { borderColor: colors.primary }]} />
               <View style={[styles.logoBackdrop, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Image source={require("../../assets/branding/tuonta-icon.png")} style={styles.logo} resizeMode="contain" accessibilityLabel="TuonTa! app icon" />
+                <Image
+                  source={require("../../assets/branding/tuonta-icon.png")}
+                  style={styles.logo}
+                  resizeMode="contain"
+                  accessibilityLabel="TuonTa! app icon"
+                />
               </View>
               <View style={[styles.accentDot, { backgroundColor: colors.success }]} />
               <View style={[styles.accentDotSmall, { backgroundColor: colors.primary }]} />
@@ -83,11 +92,20 @@ export function WelcomeScreen() {
 
             <Text style={[styles.eyebrow, { color: colors.primary }]}>A BETTER WAY TO BEGIN</Text>
             <Text style={[styles.title, { color: colors.text }]}>Make your next move count.</Text>
-            <Text style={[styles.subtitle, { color: colors.muted }]}>TuonTa! keeps your academic goals clear, organized, and moving forward.</Text>
+            <Text style={[styles.subtitle, { color: colors.muted }]}>
+              TuonTa! keeps your academic goals clear, organized, and moving forward.
+            </Text>
 
-            <Animated.View style={[styles.greetingCard, { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: successScale }] }]}>
+            <Animated.View
+              style={[
+                styles.greetingCard,
+                { backgroundColor: colors.surface, borderColor: colors.border, transform: [{ scale: successScale }] },
+              ]}
+            >
               <Text style={[styles.greetingLabel, { color: colors.muted }]}>YOUR PERSONAL GREETING</Text>
-              <Text style={[styles.greeting, { color: colors.text }]} numberOfLines={2}>{greeting}</Text>
+              <Text style={[styles.greeting, { color: colors.text }]} numberOfLines={2}>
+                {greeting}
+              </Text>
               <Text style={[styles.greetingHint, { color: colors.muted }]}>Let’s make progress together.</Text>
             </Animated.View>
 
@@ -97,14 +115,22 @@ export function WelcomeScreen() {
                 autoCorrect={false}
                 label="What should we call you?"
                 maxLength={32}
-                onChangeText={(value) => { setName(value); if (hasSubmitted) setHasSubmitted(false); }}
+                onChangeText={(value) => {
+                  setName(value);
+                  if (hasSubmitted) setHasSubmitted(false);
+                }}
                 onSubmitEditing={handleContinue}
                 placeholder="Enter your name"
                 returnKeyType="done"
                 value={name}
                 error={nameError}
               />
-              <PrimaryButton disabled={!isValid} label={isSaving ? "Preparing your space..." : "Enter TuonTa!"} loading={isSaving} onPress={handleContinue} />
+              <PrimaryButton
+                disabled={!isValid}
+                label={isSaving ? "Preparing your space..." : "Enter TuonTa!"}
+                loading={isSaving}
+                onPress={handleContinue}
+              />
             </View>
 
             <Text style={[styles.tagline, { color: colors.primary }]}>Tuon ta, human ta.</Text>
@@ -126,10 +152,29 @@ const styles = StyleSheet.create({
   brandMarkText: { fontSize: 18, fontWeight: "900" },
   brandName: { fontSize: 17, fontWeight: "900", letterSpacing: 1.4 },
   hero: { alignItems: "center", height: 178, justifyContent: "center", marginBottom: spacing.sm, width: 210 },
-  orbit: { borderRadius: 90, borderWidth: 1, height: 176, position: "absolute", transform: [{ rotate: "-14deg" }], width: 176 },
+  orbit: {
+    borderRadius: 90,
+    borderWidth: 1,
+    height: 176,
+    position: "absolute",
+    transform: [{ rotate: "-14deg" }],
+    width: 176,
+  },
   orbitOne: { opacity: 0.45 },
   orbitTwo: { height: 142, opacity: 0.35, transform: [{ rotate: "22deg" }], width: 142 },
-  logoBackdrop: { alignItems: "center", borderRadius: 55, borderWidth: 1, elevation: 5, height: 110, justifyContent: "center", shadowColor: "#0B2BAA", shadowOffset: { height: 10, width: 0 }, shadowOpacity: 0.14, shadowRadius: 18, width: 110 },
+  logoBackdrop: {
+    alignItems: "center",
+    borderRadius: 55,
+    borderWidth: 1,
+    elevation: 5,
+    height: 110,
+    justifyContent: "center",
+    shadowColor: "#0B2BAA",
+    shadowOffset: { height: 10, width: 0 },
+    shadowOpacity: 0.14,
+    shadowRadius: 18,
+    width: 110,
+  },
   logo: { height: 86, width: 86 },
   accentDot: { borderRadius: 9, bottom: 20, height: 18, position: "absolute", right: 25, width: 18 },
   accentDotSmall: { borderRadius: 5, height: 10, left: 27, position: "absolute", top: 28, width: 10 },

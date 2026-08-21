@@ -52,3 +52,14 @@ export function getDueDateStatus(task: Pick<Task, "dueDate" | "status">): DueDat
   if (difference <= 3) return "Due soon";
   return "Upcoming";
 }
+
+/** Extract all unique tags from a list of tasks. */
+export function getAllTags(tasks: Task[]): string[] {
+  const tagSet = new Set<string>();
+  for (const task of tasks) {
+    if (task.tags) {
+      for (const tag of task.tags) tagSet.add(tag);
+    }
+  }
+  return Array.from(tagSet).sort();
+}

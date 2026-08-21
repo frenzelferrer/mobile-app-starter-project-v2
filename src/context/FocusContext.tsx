@@ -22,7 +22,13 @@ function restoreSessions(value: string | null): FocusSession[] {
     return parsed.filter((item): item is FocusSession => {
       if (!item || typeof item !== "object") return false;
       const session = item as Record<string, unknown>;
-      return typeof session.id === "string" && typeof session.taskId === "string" && typeof session.taskTitle === "string" && typeof session.minutes === "number" && typeof session.completedAt === "string";
+      return (
+        typeof session.id === "string" &&
+        typeof session.taskId === "string" &&
+        typeof session.taskTitle === "string" &&
+        typeof session.minutes === "number" &&
+        typeof session.completedAt === "string"
+      );
     });
   } catch {
     return [];
@@ -45,10 +51,16 @@ export function FocusProvider({ children }: PropsWithChildren) {
   }, [loading, sessions]);
 
   const addSession = useCallback((session: Omit<FocusSession, "id" | "completedAt">) => {
-    setSessions((current) => [{ ...session, id: `focus-${Date.now()}`, completedAt: new Date().toISOString() }, ...current]);
+    setSessions((current) => [
+      { ...session, id: `focus-${Date.now()}`, completedAt: new Date().toISOString() },
+      ...current,
+    ]);
   }, []);
   const resetSessions = useCallback(() => setSessions([]), []);
-  const value = useMemo(() => ({ sessions, loading, addSession, resetSessions }), [sessions, loading, addSession, resetSessions]);
+  const value = useMemo(
+    () => ({ sessions, loading, addSession, resetSessions }),
+    [sessions, loading, addSession, resetSessions]
+  );
 
   return <FocusContext.Provider value={value}>{children}</FocusContext.Provider>;
 }

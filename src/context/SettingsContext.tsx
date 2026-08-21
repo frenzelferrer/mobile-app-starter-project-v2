@@ -50,10 +50,14 @@ export function SettingsProvider({ children }: PropsWithChildren) {
           const parsed = JSON.parse(stored) as Partial<ProfileSettings>;
           setSettings((current) => {
             const next = { ...current, ...parsed };
-            const hasMeaningfulName = typeof next.name === "string" && next.name.trim().length >= 2 && next.name.trim().toLowerCase() !== "your name";
+            const hasMeaningfulName =
+              typeof next.name === "string" &&
+              next.name.trim().length >= 2 &&
+              next.name.trim().toLowerCase() !== "your name";
             return {
               ...next,
-              onboardingComplete: typeof parsed.onboardingComplete === "boolean" ? parsed.onboardingComplete : hasMeaningfulName,
+              onboardingComplete:
+                typeof parsed.onboardingComplete === "boolean" ? parsed.onboardingComplete : hasMeaningfulName,
             };
           });
         } catch {
@@ -67,19 +71,31 @@ export function SettingsProvider({ children }: PropsWithChildren) {
     AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(next)).catch(() => undefined);
   }, []);
 
-  const updateSettings = useCallback((updates: Partial<ProfileSettings>) => {
-    setSettings((current) => {
-      const next = { ...current, ...updates };
-      persist(next);
-      return next;
-    });
-  }, [persist]);
+  const updateSettings = useCallback(
+    (updates: Partial<ProfileSettings>) => {
+      setSettings((current) => {
+        const next = { ...current, ...updates };
+        persist(next);
+        return next;
+      });
+    },
+    [persist]
+  );
 
-  const toggleDarkMode = useCallback(() => updateSettings({ darkMode: !settings.darkMode }), [settings.darkMode, updateSettings]);
-  const resetSettings = useCallback(() => { setSettings(defaultSettings); persist(defaultSettings); }, [persist]);
+  const toggleDarkMode = useCallback(
+    () => updateSettings({ darkMode: !settings.darkMode }),
+    [settings.darkMode, updateSettings]
+  );
+  const resetSettings = useCallback(() => {
+    setSettings(defaultSettings);
+    persist(defaultSettings);
+  }, [persist]);
   const colors = settings.darkMode ? darkColors : lightColors;
 
-  const value = useMemo(() => ({ settings, colors, loading, updateSettings, toggleDarkMode, resetSettings }), [settings, colors, loading, updateSettings, toggleDarkMode, resetSettings]);
+  const value = useMemo(
+    () => ({ settings, colors, loading, updateSettings, toggleDarkMode, resetSettings }),
+    [settings, colors, loading, updateSettings, toggleDarkMode, resetSettings]
+  );
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;
 }
 

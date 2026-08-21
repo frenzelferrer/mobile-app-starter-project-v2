@@ -1,7 +1,7 @@
 {
   "name": "tuonta",
   "main": "expo/AppEntry",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "dependencies": {
     "@expo/ui": "~57.0.11",
     "@expo/vector-icons": "^15.1.1",
@@ -35,6 +35,12 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "jest": "^30.0.0",
+    "prettier": "^3.5.0",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -43,7 +49,9 @@
     "android": "node ./scripts/start-expo.cjs start --android",
     "ios": "node ./scripts/start-expo.cjs start --ios",
     "web": "node ./scripts/start-expo.cjs start --web",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"App.tsx\"",
+    "test": "jest"
   },
   "private": true
 }

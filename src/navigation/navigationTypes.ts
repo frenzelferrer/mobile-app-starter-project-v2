@@ -12,5 +12,6 @@ export type TasksStackParamList = {
 export type RootTabParamList = {
   Home: undefined;
   Tasks: NavigatorScreenParams<TasksStackParamList>;
+  Insights: undefined;
   Profile: undefined;
 };

@@ -3,11 +3,28 @@ import { StyleSheet, Text, TextInput, type TextInputProps, View } from "react-na
 import { useSettings } from "@/context/SettingsContext";
 import { spacing } from "@/theme/colors";
 
-interface FormInputProps extends TextInputProps { label: string; error?: string; }
+interface FormInputProps extends TextInputProps {
+  label: string;
+  error?: string;
+}
 
 export function FormInput({ label, error, style, ...props }: FormInputProps) {
   const { colors } = useSettings();
-  return <View style={styles.container}><Text style={[styles.label, { color: colors.text }]}>{label}</Text><TextInput {...props} style={[styles.input, { backgroundColor: colors.surface, borderColor: error ? colors.danger : colors.border, color: colors.text }, style]} placeholderTextColor={colors.muted} />{error ? <Text style={[styles.error, { color: colors.danger }]}>{error}</Text> : null}</View>;
+  return (
+    <View style={styles.container}>
+      <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
+      <TextInput
+        {...props}
+        style={[
+          styles.input,
+          { backgroundColor: colors.surface, borderColor: error ? colors.danger : colors.border, color: colors.text },
+          style,
+        ]}
+        placeholderTextColor={colors.muted}
+      />
+      {error ? <Text style={[styles.error, { color: colors.danger }]}>{error}</Text> : null}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
