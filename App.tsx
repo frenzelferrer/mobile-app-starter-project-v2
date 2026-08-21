@@ -9,6 +9,9 @@ import { ReminderProvider } from "@/context/ReminderContext";
 import { TaskProvider } from "@/context/TaskContext";
 import { AppNavigator } from "@/navigation/AppNavigator";
 import { WelcomeScreen } from "@/screens/WelcomeScreen";
+import { navigationRef } from "@/navigation/navigationRef";
+import { TourProvider } from "@/context/TourContext";
+import { TourOverlay } from "@/components/TourOverlay";
 
 function AppShell() {
   const { colors, settings, loading } = useSettings();
@@ -48,9 +51,10 @@ function AppShell() {
   }
 
   return (
-    <NavigationContainer theme={navigationTheme}>
+    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
       <StatusBar style={settings.darkMode ? "light" : "dark"} />
       <AppNavigator />
+      <TourOverlay />
     </NavigationContainer>
   );
 }
@@ -62,7 +66,9 @@ export default function App() {
         <TaskProvider>
           <FocusProvider>
             <ReminderProvider>
-              <AppShell />
+              <TourProvider>
+                <AppShell />
+              </TourProvider>
             </ReminderProvider>
           </FocusProvider>
         </TaskProvider>

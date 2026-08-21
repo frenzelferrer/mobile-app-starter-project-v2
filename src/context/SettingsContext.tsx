@@ -14,6 +14,7 @@ export interface ProfileSettings {
   onboardingComplete: boolean;
   remindersEnabled: boolean;
   completionFeedbackEnabled: boolean;
+  tourCompleted: boolean;
 }
 
 interface SettingsContextValue {
@@ -34,6 +35,7 @@ const defaultSettings: ProfileSettings = {
   onboardingComplete: false,
   remindersEnabled: true,
   completionFeedbackEnabled: true,
+  tourCompleted: false,
 };
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
